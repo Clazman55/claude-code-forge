@@ -46,7 +46,7 @@ Read `~/.claude/CLAUDE.md` for global standards and workflow expectations.
 
 **For `full` project types:** Read `~/.claude/skills/code-architecture-for-ai.md` before planning the architecture. Apply its principles when making decisions about file structure, module boundaries, and documentation in Steps 2-3.
 
-Check `~/.claude/skills/components-index.md` for existing implementations relevant to this project's requirements. Reference specific components in the plan file (e.g., "Registry scanning: adapt from SystemInventory's Get-InstalledSoftware.ps1") rather than planning to build from scratch.
+Check `~/.claude/skills/components-index.md` for existing implementations relevant to this project's requirements. Reference specific components in the plan file (e.g., "Registry scanning: adapt from existing Get-InstalledSoftware implementation") rather than planning to build from scratch.
 
 Based on the idea file, identify what needs to be researched before planning:
 - Unknown APIs, libraries, or tools referenced in the idea
