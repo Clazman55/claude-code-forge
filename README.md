@@ -79,9 +79,9 @@ Knowledge lives in three layers, each with a different scope and lifetime:
 ```
 ┌─────────────────────────────────────────────┐
 │  MEMORY.md (routing table)                  │
-│  Auto-loaded every session. 200-line hard    │
-│  limit (truncated without warning beyond     │
-│  that). Points to everything else.           │
+│  Auto-loaded every session. 200-line hard   │
+│  limit (truncated without warning beyond    │
+│  that). Points to everything else.          │
 ├─────────────────────────────────────────────┤
 │  Memory Satellites (project-specific)       │
 │  Implementation details: function names,    │
