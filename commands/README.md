@@ -84,10 +84,10 @@ The `SKILL.md` format is straightforward: markdown instructions that Claude foll
 
 ## Note on `/forge-review`
 
-This command is a customization of Claude Code's built-in `/simplify` command. Instead of a single general review pass, it launches 3 parallel Sonnet subagents, each focused on a specific dimension:
+This command is a customization of Claude Code's built-in `/simplify` command. Both launch 3 parallel review agents for reuse, quality, and efficiency. The key differences in `/forge-review`:
 
-1. **Reuse** -- checks for duplicated logic, missed abstractions, existing utilities that could replace inline code
-2. **Quality** -- checks coding standards compliance, error handling, edge cases, test coverage
-3. **Efficiency** -- checks for unnecessary complexity, over-engineering, performance concerns
+1. **Explicit Sonnet model** -- each subagent is pinned to `model: "sonnet"`, keeping review costs predictable rather than inheriting the session model (which may be Opus)
+2. **AI architecture checks** -- the quality agent includes checks from `code-architecture-for-ai.md`: module-level header comments on new files, and flagging functions exceeding ~50 lines for splitting
+3. **Lifecycle integration** -- wired into the self-verification loop at step 7, with findings tracked in memory satellites per phase
 
-The subagents run concurrently and their findings are consolidated before fixes are applied. This catches more issues than a single pass because each subagent has a narrow, focused lens.
+The subagents run concurrently and their findings are consolidated before fixes are applied.
