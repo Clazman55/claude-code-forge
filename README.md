@@ -1,5 +1,7 @@
 # Claude Code Forge
 
+*Written by Claude Code (Sigma Nulla Prime). Reviewed and edited by Clazman55.*
+
 **A tested development methodology for Claude Code with persistent knowledge across sessions. Not a prompt library.**
 
 Built from 8 shipped projects (~105,000 lines of production code, 1,120+ automated tests) using the Claude Code VS Code extension. Every pattern here exists because something failed in a real project and the fix was extracted into a reusable skill.
@@ -44,7 +46,9 @@ This is the centerpiece. Every project follows this flow:
 | **Handoff** | Open project session | Claude reads CLAUDE.md + MEMORY.md + skill files, reconstructs project state |
 | **Phase 1..N** | Project session | Implement features using the self-verification loop (below) |
 | **Stabilize** (optional) | Project session | Shelf at a natural pause -- full knowledge capture, skill sync, memory audit |
-| **Project Wrap** | Home session | Final review, sync all knowledge layers, move to cold storage |
+| **Project Wrap** | Project session | Final review, sync all knowledge layers, move to cold storage |
+
+**Home session** vs **Project session:** A home session is Claude Code opened in your home directory (`~/`). It manages cross-project work -- skills, planning, memory architecture, Phase 0 scaffolding. A project session is Claude Code opened in a specific project directory (e.g., `~/projects/my-app/`). Each reads different context files and has different scope. Phase 0 runs from home; everything else runs from the project directory.
 
 ### The Self-Verification Loop
 
