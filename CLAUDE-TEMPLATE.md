@@ -67,7 +67,7 @@ Run after every phase. Check:
 
 ## Memory Management
 
-- MEMORY.md has a 200-line context limit -- keep it index-level
+- MEMORY.md has a 200-line hard limit -- content beyond line 200 is silently truncated and not loaded
 - Use satellite files (e.g., `systems.md`, `patterns.md`) for detailed notes, linked from MEMORY.md
 - Proactively split before hitting the limit, not after
 - See `knowledge-architecture.md` for the three-layer model: Skills (portable) → Satellites (project-specific) → MEMORY.md (routing table)

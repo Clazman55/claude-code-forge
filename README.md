@@ -16,6 +16,8 @@ The common response is prompt libraries -- collections of generic instructions y
 
 This repository treats the disease: a structured methodology where knowledge persists across sessions, accumulates over time, and flows from project-specific observations into portable, reusable patterns.
 
+**Who this is for:** Intermediate-to-advanced Claude Code users who have already hit the session continuity wall and want to fix it structurally. If you've had Claude rebuild something it already built two sessions ago, you're the audience. If you're still learning Claude Code basics, start there first -- this methodology assumes you're already comfortable with multi-session projects and want to make them actually work.
+
 ---
 
 ## What This Is / Is Not
@@ -29,7 +31,7 @@ This repository treats the disease: a structured methodology where knowledge per
 **This is not:**
 - A prompt library (no generic "be a better coder" instructions)
 - Infrastructure (no Docker, no vector databases, no self-hosted embeddings, no MCP servers)
-- A framework (no code to install, no dependencies, no build steps)
+- Runtime infrastructure (no code to install, no dependencies, no build steps -- the file conventions and lifecycle are lightweight framework patterns, but nothing executes except Claude reading markdown)
 - A living project (snapshot releases with version tags, not continuous maintenance)
 
 Everything runs on markdown files and Claude Code's built-in features. If you have a text editor and Claude Code, you have everything you need.
@@ -77,8 +79,9 @@ Knowledge lives in three layers, each with a different scope and lifetime:
 ```
 ┌─────────────────────────────────────────────┐
 │  MEMORY.md (routing table)                  │
-│  Auto-loaded every session. 200-line limit. │
-│  Points to everything else. Never detailed. │
+│  Auto-loaded every session. 200-line hard    │
+│  limit (truncated without warning beyond     │
+│  that). Points to everything else.           │
 ├─────────────────────────────────────────────┤
 │  Memory Satellites (project-specific)       │
 │  Implementation details: function names,    │
@@ -241,6 +244,20 @@ Every skill in this repository exists because something broke.
 The anti-pattern tables aren't theoretical. They're postmortems. The gotchas aren't hypothetical. They're things that cost hours to debug.
 
 This isn't a system designed from first principles. It's scar tissue from 8 projects, organized into something reusable. The methodology works because it was built iteratively by the same process it describes.
+
+---
+
+## When Not to Use This
+
+The methodology has overhead. That overhead pays for itself on multi-phase projects where session continuity matters. It does not pay for itself everywhere.
+
+**Don't use this for:**
+- **Single-session tasks** -- if the project ships in one conversation, CLAUDE.md is all you need. Skip the lifecycle.
+- **Quick scripts and one-offs** -- a 50-line utility doesn't need Phase 0, a plan file, and a self-verification loop. Just write it.
+- **Projects with one phase** -- the knowledge architecture earns its keep across phases. One phase means no continuity problem to solve.
+- **Learning projects** -- if you're exploring a new language or framework, the structure can constrain the exploration. Learn first, systematize later.
+
+**The break-even point:** roughly 3+ phases with meaningful complexity. Below that, the methodology costs more attention than it saves. Above that, the compounding knowledge effect makes each subsequent phase faster than the last.
 
 ---
 
