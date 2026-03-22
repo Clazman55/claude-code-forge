@@ -97,6 +97,8 @@ Knowledge lives in three layers, each with a different scope and lifetime:
 └─────────────────────────────────────────────┘
 ```
 
+**Note:** This architecture describes the project-level auto-memory system (`~/.claude/projects/`). It sits alongside Claude Code's global instruction files -- `CLAUDE.md` at your project root and `~/.claude/CLAUDE.md` for global settings -- which are loaded in full every session with no line limit. The global CLAUDE.md is where you define your working relationship, coding standards, and preferences. The three layers above handle project-specific knowledge that accumulates during implementation. See [Claude Code's memory documentation](https://code.claude.com/docs/en/memory) for how all the pieces fit together.
+
 **Content flows upward as it matures:**
 1. Project-specific observation → satellite entry
 2. Satellite pattern repeated across phases → project skill annotation
