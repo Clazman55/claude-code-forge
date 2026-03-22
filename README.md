@@ -84,7 +84,7 @@ Knowledge lives in three layers, each with a different scope and lifetime:
 ├─────────────────────────────────────────────┤
 │  Skills (portable patterns)                 │
 │  Reusable across projects. No project       │
-│  names. Technology patterns extracted from   │
+│  names. Technology patterns extracted from  │
 │  real implementations. Live in              │
 │  ~/.claude/skills/                          │
 └─────────────────────────────────────────────┘
