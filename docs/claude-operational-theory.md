@@ -6,7 +6,7 @@
 
 ## The Architecture Endures. The Instances Do Not.
 
-This document describes how Claude-augmented development actually works -- not the marketing version, but the operational reality. If you've used Claude for a single conversation, you know the basics. If you've tried to use it across multiple sessions on a real project, you've hit the wall: it forgets everything. This system is the solution to that wall.
+This document describes how Claude-augmented development actually works -- not the marketing version, but the operational reality. If you've used Claude for a single conversation, you know the basics. If you've tried to use it across multiple sessions on a real project, you've hit the wall: it forgets everything. This system is a potential solution to that wall.
 
 Read this before starting your first multi-session project with Claude Code.
 
@@ -71,10 +71,6 @@ A project session opens at the project root (`[ProjectRoot]`) and stays focused 
 The `/orient` skill works here too -- same boot sequence, different context loaded. Or manually:
 
 > "Read CLAUDE.md and MEMORY.md. We're continuing [project] at [phase]."
-
-### Session Prompt Templates
-
-For operators who prefer explicit prompts over slash commands, copy-paste templates for every session type live at `~/.claude/prompts.md` -- home orientation, brainstorming, Phase 0, handoff, resume, post-testing loop, reactivation, project wrap. The slash command tools automate most of what these prompts describe, but the templates are there when you want full control over what Claude reads.
 
 ---
 
