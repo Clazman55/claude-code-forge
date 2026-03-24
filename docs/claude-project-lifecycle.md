@@ -235,8 +235,6 @@ When a single-file app outgrows its architecture (typically 5,000+ lines), split
     └── TestingGuide.html   # Manual testing checklist
 ```
 
-**Key conventions:** Shared mutable state on a `G` namespace object. Circular dependencies resolved via three strategies: shared functions in state.js, `G.fn()` wiring in main.js, and `setXDeps()` injection for render modules. Dev uses ES6 modules via `serve.ps1`; production bundles into a single distributable HTML.
-
 The `docs/existing/` folder holds reference material -- original code, specs, assessment documents. It is never modified during implementation. The `tests/` folder gets `TestingGuide.html` at minimum; automated test files are added if the tech stack supports it.
 
 ---
