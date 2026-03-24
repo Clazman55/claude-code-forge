@@ -36,6 +36,8 @@ This repository treats the disease: a structured methodology where knowledge per
 
 Everything runs on markdown files and Claude Code's built-in features. If you have a text editor and Claude Code, you have everything you need.
 
+**This README is the condensed version.** The full operational theory and lifecycle reference are in [`docs/`](docs/) -- [`claude-operational-theory.md`](docs/claude-operational-theory.md) covers the session model, knowledge architecture, and working relationship; [`claude-project-lifecycle.md`](docs/claude-project-lifecycle.md) covers the complete phase workflow, self-verification loop, and quality gate.
+
 ---
 
 ## The Lifecycle
@@ -140,7 +142,7 @@ This one-way flow during implementation prevents half-baked patterns from contam
 - **CLAUDE-TEMPLATE.md** -- blank CLAUDE.md template for new projects
 - **CLAUDE-EXAMPLE.md** -- redacted real-world example showing expected depth
 - **commands/README.md** -- how to install and use slash commands
-- **docs/** -- working register, station brief, and full operational theory documents (the README is the condensed version; `docs/claude-operational-theory.md` and `docs/claude-project-lifecycle.md` are the complete reference)
+- **docs/** -- working register explanation and example
 
 **Stats from the projects that built this:**
 - 8 shipped projects across PowerShell, JavaScript, C#, and HTML5
