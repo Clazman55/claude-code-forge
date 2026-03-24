@@ -140,7 +140,7 @@ This one-way flow during implementation prevents half-baked patterns from contam
 - **CLAUDE-TEMPLATE.md** -- blank CLAUDE.md template for new projects
 - **CLAUDE-EXAMPLE.md** -- redacted real-world example showing expected depth
 - **commands/README.md** -- how to install and use slash commands
-- **docs/** -- working register explanation and example
+- **docs/** -- working register, station brief, and full operational theory documents (the README is the condensed version; `docs/claude-operational-theory.md` and `docs/claude-project-lifecycle.md` are the complete reference)
 
 **Stats from the projects that built this:**
 - 8 shipped projects across PowerShell, JavaScript, C#, and HTML5
