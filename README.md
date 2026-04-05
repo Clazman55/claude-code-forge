@@ -137,6 +137,12 @@ This one-way flow during implementation prevents half-baked patterns from contam
 | /brainstorm | Open-ended exploration -- read ideas, survey work, generate concepts |
 | /audit-code | Full project audit -- architecture, infrastructure, testing, memory health |
 
+### Analysis
+
+Research synthesis pieces that explain *why* the methodology's practices work at a mechanical level. See [`analysis/`](analysis/) for the full list.
+
+- **[Functional Emotions Guide](analysis/functional-emotions-guide.md)** -- How emotion vectors in LLMs causally drive behavior, and what that means for instruction framing, session management, and output quality. Based on Anthropic's 2026 emotion representations research and MIT's Bayesian analysis of sycophancy-induced delusional spiraling.
+
 ### Also Included
 
 - **CLAUDE-TEMPLATE.md** -- blank CLAUDE.md template for new projects
