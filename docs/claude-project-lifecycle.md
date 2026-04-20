@@ -8,7 +8,7 @@
 
 Every project built with Claude Code follows the same lifecycle, regardless of language or domain. The structure exists because Claude has no memory between sessions -- without it, each conversation starts from scratch and accumulated knowledge is lost. This lifecycle solves that problem by externalizing everything into files that persist across sessions.
 
-The workflow has been validated across nine projects totalling approximately 44,000 lines of source code, spanning PowerShell modules, HTML5 games, system utilities, an incremental game with esbuild bundling, and a public methodology repository.
+The workflow has been validated across 15 projects totalling approximately 150,000+ lines of source code, spanning PowerShell modules, HTML5 games, C#/.NET applications, incremental games with esbuild bundling, a MonoGame arena RTS, and a public methodology repository.
 
 ```
 Phase 0 (Home Session)       Research, plan, scaffold, create skills

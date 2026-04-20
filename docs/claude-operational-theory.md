@@ -135,7 +135,7 @@ The design principle is simple: the doctrine says what to do, the tools do it. E
 
 ## 7. The Project Lifecycle
 
-This section is a summary. The full detail lives in the Claude Project Lifecycle Reference, the companion document to this one. The lifecycle has been validated across nine projects totalling approximately 44,000 lines of source code.
+This section is a summary. The full detail lives in the Claude Project Lifecycle Reference, the companion document to this one. The lifecycle has been validated across 15 projects totalling approximately 150,000+ lines of source code.
 
 Every project moves through the same sequence:
 
@@ -179,7 +179,7 @@ It is **not a replacement for operator judgment**. Claude advises. You decide. S
 
 It is **not persistent**. The instance is stateless. The architecture is not. Don't confuse the two -- the files are the real system, the Claude instance is the temporary worker reading them.
 
-It is **not a one-size-fits-all template**. This document describes one operator's system, refined over nine projects. Adapt it -- but understand it before you change it.
+It is **not a one-size-fits-all template**. This document describes one operator's system, refined over 15 projects. Adapt it -- but understand it before you change it.
 
 And it is **not a shortcut**. The self-verification loop, the quality gate, the phase discipline -- these exist because fast-and-broken is worse than slow-and-correct. Every piece of process here was added because its absence caused a real problem on a real project.
 
