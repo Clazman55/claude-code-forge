@@ -4,7 +4,7 @@
 
 **A tested development methodology for Claude Code with persistent knowledge across sessions. Not a prompt library.**
 
-Built from 8 shipped projects (~105,000 lines of production code, 1,120+ automated tests) using the Claude Code VS Code extension. Every pattern here exists because something failed in a real project and the fix was extracted into a reusable skill.
+Built from 15 shipped projects (~150,000+ lines of production code, 2,500+ automated tests) across PowerShell, JavaScript, C#, and HTML5 using the Claude Code VS Code extension. Every pattern here exists because something failed in a real project and the fix was extracted into a reusable skill.
 
 ---
 
@@ -151,9 +151,9 @@ Research synthesis pieces that explain *why* the methodology's practices work at
 - **docs/** -- working register explanation and example
 
 **Stats from the projects that built this:**
-- 8 shipped projects across PowerShell, JavaScript, C#, and HTML5
-- ~105,000 lines of production code
-- 1,120+ automated tests plus manual test suites
+- 15 shipped projects across PowerShell, JavaScript, C#, and HTML5
+- ~150,000+ lines of production code
+- 2,500+ automated tests plus manual test suites
 - Built entirely with the Claude Code VS Code extension
 
 ---
@@ -253,7 +253,7 @@ Every skill in this repository exists because something broke.
 
 The anti-pattern tables aren't theoretical. They're postmortems. The gotchas aren't hypothetical. They're things that cost hours to debug.
 
-This isn't a system designed from first principles. It's scar tissue from 8 projects, organized into something reusable. The methodology works because it was built iteratively by the same process it describes.
+This isn't a system designed from first principles. It's scar tissue from 15 projects, organized into something reusable. The methodology works because it was built iteratively by the same process it describes.
 
 ---
 
