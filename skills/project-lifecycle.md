@@ -66,6 +66,14 @@ Run from the home directory session: `~/.claude/projects/<home-key>`
 
 5. **Use plan mode for architectural decisions**: When Phase 0 hits meaningful decisions — tech stack, runtime target, module structure, key tradeoffs — enter plan mode so the user gets the interactive UI. Plain Q&A is a fallback, not the default.
 
+5a. **Pattern fit check** (before writing the plan): Ask explicitly:
+   - "What prior project am I reaching for? Why?"
+   - "What's different about THIS project that might break that pattern?"
+   - "Which architectural defaults am I carrying? Are they justified here?"
+   Record answers in the plan file's Frame Audit section.
+
+5b. **Plan critique agent**: After drafting the plan but BEFORE presenting to the user, run a Sonnet plan critique agent against the draft (5 dimensions: dependencies, sizing, assumptions, skill gaps, regression). Include findings in the plan presentation.
+
 6. **Create project directory**:
    ```
    E:\ProjectName\
@@ -88,11 +96,13 @@ Run from the home directory session: `~/.claude/projects/<home-key>`
 
 11. **Create plan file** at `~/.claude/plans/<plan-name>.md` with Phase 0 work summary and subsequent phase outlines.
 
-12. **Commit Phase 0**: `git add` all scaffolding files and commit with "Phase 0: Project infrastructure". Phase 0 touches both project files AND global files (skills, home directory memory, CLAUDE.md) — commit the project repo now so the implementation session starts from a clean baseline. Global files (in `~/.claude/`) are not git-tracked but are updated; the project commit captures the project-side artifacts.
+12. **Create project memory folder and architecture satellite**: Create `~/.claude/projects/<project-key>/memory/` and write `phase0-architecture.md` with structured decisions. Architecture satellite format: Decision + Default + Break condition + Pattern source + Why chosen. See `code-architecture-for-ai.md` Phase 0 Decision Points for the standard questions.
+
+13. **Commit Phase 0**: `git add` all scaffolding files and commit with "Phase 0: Project infrastructure". Phase 0 touches both project files AND global files (skills, home directory memory, CLAUDE.md) — commit the project repo now so the implementation session starts from a clean baseline. Global files (in `~/.claude/`) are not git-tracked but are updated; the project commit captures the project-side artifacts.
 
 ### What Phase 0 is NOT
 
-Phase 0 is research and scaffolding. Don't write application code in Phase 0. The deliverables are: skills, CLAUDE.md, TestingGuide skeleton, plan file, directory structure.
+Phase 0 is research and scaffolding. Don't write application code in Phase 0. The deliverables are: skills, CLAUDE.md, TestingGuide skeleton, plan file, directory structure, architecture satellite.
 
 ---
 
@@ -116,6 +126,9 @@ Every project gets a CLAUDE.md at its root. This is the contract between Claude 
 [ASCII tree showing all files and folders]
 
 ## Key Architectural Decisions
+
+[Summary entries. Full decisions with defaults, break conditions, and pattern sources
+live in `phase0-architecture.md` in the project memory folder.]
 
 - [Decision 1 with rationale]
 - [Decision 2 with rationale]
@@ -153,16 +166,16 @@ Run after every phase. Check:
 
 ## Self-Verification Loop (per phase)
 
-1. Phase kickoff — `/kickoff` skill: read plan/code/memory, present gameplan (incl. test plan) + numbered questions/suggestions tagged [Design] [Clarification] [Suggestion] [Risk], wait for user
-2. Write code + automated tests (Pester/xUnit/inline) — run tests, fix failures. Code is NOT presented for review until automated tests pass.
+1. Phase kickoff — `/kickoff` skill: read plan/code/memory, present gameplan (incl. test plan) + numbered questions/suggestions tagged [Design] [Clarification] [Suggestion] [Risk], wait for user. Produces phase satellite (`phaseN-decisions.md`) from Q&A.
+2. Write code + automated tests (Pester/xUnit/inline) — run tests, fix failures. Code is NOT presented for review until automated tests pass. Record significant mid-phase decisions in the phase satellite as they happen.
 3. Update TestingGuide.html — manual test steps for user-facing behavior (the operator's inspection, separate from automated tests)
 4. User follows TestingGuide
 5. User reports results
 6. Fix failures
-7. `/forge-review` — three-agent review
-8. Fix issues
+7. `/forge-review` — three-agent review. Categorize findings as FIX/DEFER/DISMISS. Deferred and dismissed items → `deferred.md` satellite.
+8. Fix FIX-category issues
 8a. `/test-audit` (conditional) — if non-trivial failures this phase, extract testing patterns to satellite
-9. Update CLAUDE.md — `/phase-wrap` skill handles steps 8a-11 + commit
+9. Update CLAUDE.md — `/phase-wrap` skill handles steps 8a-11 + commit. Reads phase satellite as source of truth. Checks `deferred.md` for resolved items.
 10. Update project skills (docs/) with verified patterns — canonical sync at wrap only
 11. Update MEMORY.md + satellites, then next phase
 

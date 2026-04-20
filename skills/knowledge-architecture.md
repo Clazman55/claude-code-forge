@@ -58,7 +58,10 @@ Lifecycle: Grows with each phase. Organized by topic, not chronologically.
 **Satellite file organization:**
 - `systems.md` — Per-phase subsystem details, function inventory, state shapes
 - `patterns.md` — Project-verified coding patterns and bug patterns to avoid
-- `decisions.md` — Architectural decisions with rationale (optional, for complex projects)
+- `phase0-architecture.md` — Foundational architecture decisions with defaults, break conditions, pattern sources. Created during Phase 0 scaffold.
+- `phaseN-decisions.md` — Per-phase kickoff decisions (Q&A outcomes, user directives, mid-phase changes). Created at kickoff, appended during implementation.
+- `deferred.md` — Forge review findings deferred for later phases or wrap. Created on first deferral, resolved at stabilize/wrap.
+- `decisions.md` — Architectural decisions with rationale (legacy naming, superseded by phase0-architecture + phaseN-decisions for new projects)
 - `testing-patterns.md` — Root cause analysis from `/test-audit`, failure categories, test coverage gaps
 - Topic files as needed — whatever logical grouping serves the project
 

@@ -24,6 +24,12 @@ Use when a project reaches a natural pause point (MVP complete, milestone achiev
 ### 1. Final /forge-review Pass
 Run `/forge-review` on the last phase's changes. Fix all real findings.
 
+### 1a. Deferred Findings Review
+Read `deferred.md` in the project memory folder (if it exists). For each open item:
+- **Fix now** if still relevant and the fix is clean
+- **Close with rationale** if no longer relevant
+- Mark resolved items as `[RESOLVED at stabilize]`
+
 ### 2. Satellite Audit
 Read ALL satellite files (patterns.md, systems.md, etc.) cover to cover. For each entry, ask: "Is this generalizable?" Patterns that looked project-specific early on may be clearly universal in hindsight. Promote generalizable patterns to project skills (`docs/`).
 

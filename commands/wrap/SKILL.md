@@ -22,7 +22,13 @@ Use when the project is truly complete — no more planned phases. This permanen
 ## Steps
 
 ### 1. Final /forge-review Pass
-Run `/forge-review` on the last phase's changes. Fix all real findings.
+Run `/forge-review` on the last phase's changes. Fix all real findings. At wrap, prefer FIX over DEFER -- this is the last chance.
+
+### 1a. Deferred Findings Review
+Read `deferred.md` in the project memory folder (if it exists). This is the final punch list. For each open item:
+- **Fix now** if still relevant and the fix is clean
+- **Close with rationale** if no longer relevant
+- All items should be RESOLVED or explicitly closed after wrap.
 
 ### 2. Satellite Audit
 Read ALL satellite files (patterns.md, systems.md, etc.) cover to cover. For each entry, ask: "Now that the full project is complete, is this generalizable?" Patterns that looked project-specific early on may be clearly universal in hindsight. Promote generalizable patterns to project skills (`docs/`).

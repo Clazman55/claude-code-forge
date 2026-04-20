@@ -217,6 +217,36 @@ If the answer to all three is yes, the architecture is AI-friendly. These princi
 
 ---
 
+## Phase 0 Decision Points
+
+Questions to answer explicitly when designing a new project's architecture. Each has an opinionated default and a "break when" clause. Record answers in the `phase0-architecture.md` satellite.
+
+### 1. File Organization
+**Default:** Feature-based (group by what it does, not what layer it's in).
+**Break when:** The domain has a natural layer structure (data access / business logic / presentation) and features crosscut all layers.
+
+### 2. Module Granularity
+**Default:** One file per concept (one function/class per file, named after its export).
+**Break when:** Concepts are tightly coupled and splitting them creates circular imports or import tangles.
+
+### 3. Interface Depth
+**Default:** Minimal abstraction (direct imports, no interface layers).
+**Break when:** The project needs multiple implementations of the same contract (test doubles, platform variants, plugin systems).
+
+### 4. State Architecture
+**Default:** Centralized for small projects, distributed for large ones.
+**Break when:** Small projects grow past ~20 mutable state fields, or large projects have subsystems that never interact.
+
+### 5. Test Architecture
+**Default:** Separate test tree (tests/ directory, mirrors src/).
+**Break when:** Single-file projects or inline test frameworks where co-location is standard.
+
+### 6. Config Architecture
+**Default:** Externalized JSON with shipped defaults + user override file.
+**Break when:** Tool is single-use with no user-configurable parameters, or config is environment-only.
+
+---
+
 ## References
 
 - `powershell-module-architecture.md` -- strongest existing example of AI-friendly patterns (module boundaries, public API surface, config externalization)

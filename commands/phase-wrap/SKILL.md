@@ -38,12 +38,19 @@ Before starting the wrap, check: were there non-trivial test failures this phase
 - Do NOT sync to canonical skills (`~/.claude/skills/`) — that happens at stabilize or project wrap only
 
 ### 3. Update MEMORY.md and Satellites
+- **Read the phase satellite** (`phaseN-decisions.md`): Review all decisions recorded this phase. Ensure nothing significant was missed -- if a mid-phase decision wasn't appended during implementation, add it now.
+- **Check `deferred.md`**: If any deferred items from this or prior phases were resolved during this phase's work, mark them `[RESOLVED in Phase N]` with brief context.
 - Update project MEMORY.md status: current phase complete, next phase identified
-- Add any decisions, gotchas, or key facts discovered during the phase
+- Promote decisions that affect all future phases to CLAUDE.md "Key Architectural Decisions" section
 - If MEMORY.md is getting long (approaching 200 lines), split detail into satellite files (systems.md, patterns.md)
-- Update `/forge-review` findings section with what was caught and fixed this phase
 
 ### 4. Commit
 Stage all changed files and commit with message: `Phase [N]: [Phase description summary]`
 
 Run `git status` after commit to verify clean state.
+
+### 5. Offer Compaction
+
+After commit, suggest: "Phase wrapped and committed. The phase satellite holds all decisions -- context can safely compact here if you'd like to clear before the next phase."
+
+The user controls compaction timing. This is a suggestion, not an automatic action.

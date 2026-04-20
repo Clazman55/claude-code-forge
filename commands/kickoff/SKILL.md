@@ -22,9 +22,20 @@ Read the following sources in order:
 3. **Plan file** — the plan file path is in the home directory MEMORY.md bootstrap entry for this project. Read the plan to understand the full phase breakdown and what this phase covers.
 4. **Relevant source code** — read the files you'll be modifying this phase. Don't skim — understand the current state before proposing changes.
 
-## Step 2: Plan Critique (Subagent)
+## Step 2: Phase 0 Assumption Check
 
-After reading context, spawn a Sonnet subagent to adversarially review the phase plan. The subagent receives the plan content, project CLAUDE.md summary, current phase scope, and the critique checklist below. The session does NOT self-critique -- a separate agent provides genuine adversarial separation.
+Verify that this phase's scope still fits within the architecture established during Phase 0.
+
+If a `phase0-architecture.md` satellite exists in the project memory folder:
+- "Does anything about this phase's deliverables change or strain a Phase 0 assumption?"
+- If YES: flag as a [Design] question in the gameplan. Record approved modifications in the phase satellite with `Modifies: Phase 0 decision #N`.
+- If NO: note "Phase 0 assumptions hold" and proceed.
+
+If no architecture satellite exists (legacy projects): consider running a lightweight frame challenge -- enumerate the plan's meta-decisions, flag the most familiar one, generate a brief alternative.
+
+## Step 3: Plan Critique (Subagent)
+
+After the assumption check, spawn a Sonnet subagent to adversarially review the phase plan. The subagent receives the plan content, project CLAUDE.md summary, current phase scope, and the critique checklist below. The session does NOT self-critique -- a separate agent provides genuine adversarial separation.
 
 ### Subagent Prompt
 
@@ -117,6 +128,14 @@ it produces corresponding test files.
 - **Pseudocode gate for complex logic:** If a phase involves algorithmic complexity (balance calculations, state machines, cost scaling, multi-step transformations, combat resolution), include the algorithm as pseudocode in the Implementation Steps and tag it `[Approval Required]`. Do not implement until the operator approves the logic. The gameplan already covers straightforward features; this gate catches the cases where "implement X" hides non-obvious edge cases.
 - Do NOT start writing code. Wait for the user to approve the gameplan, answer questions, and give the go-ahead.
 
-## Step 4: Wait
+## Step 5: Record Phase Decisions
+
+After the user approves the gameplan and answers questions, create a phase satellite:
+
+Write `~/.claude/projects/<project-key>/memory/phaseN-decisions.md` with all decisions from the Q&A. Format: Decision + Why + How to apply + Modifies (if applicable).
+
+This satellite is a living document. Append to it during implementation when significant mid-phase decisions happen (API changes, user redirections, structural discoveries). Don't wait for phase-wrap to record decisions.
+
+## Step 6: Wait
 
 Stop. Do not write code until the user responds. They may approve as-is, modify the plan, answer questions, or redirect entirely. The kickoff is a checkpoint, not a formality.

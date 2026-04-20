@@ -24,6 +24,7 @@ Use the Agent tool to launch **three subagents simultaneously** in a single mess
 > - Repeated logic that could be consolidated into a shared function
 > - Patterns that duplicate existing utilities in the codebase
 > - Copy-paste code across files
+> Also flag any pattern in this code that seems reusable across projects or worth extracting to a skill file. Report as [Pattern] with file:line.
 > Report findings as a numbered list. If nothing found, say "No reuse issues found."
 
 ### Agent 2 -- Quality Check
@@ -34,6 +35,7 @@ Use the Agent tool to launch **three subagents simultaneously** in a single mess
 > - Dead code, unused variables, unreachable branches
 > - New source files missing a module-level header comment (purpose, dependencies, consumers)
 > - Functions exceeding ~50 lines that could be split by responsibility
+> - **Test coverage gaps:** For each changed source file with logic changes, check whether corresponding test changes exist. Flag files with new/modified logic but no test coverage.
 > Report findings as a numbered list. If nothing found, say "No quality issues found."
 
 ### Agent 3 -- Efficiency Check
@@ -42,14 +44,24 @@ Use the Agent tool to launch **three subagents simultaneously** in a single mess
 > - O(n^2) patterns where O(n) is possible
 > - Redundant operations (repeated lookups, unnecessary re-computation)
 > - Overly complex logic that could be simplified
+> Also flag any clever optimization or performance pattern worth preserving. Report as [Pattern] with file:line.
 > Report findings as a numbered list. If nothing found, say "No efficiency issues found."
 
-## Step 3: Synthesize and Act
+## Step 3: Categorize Findings
 
-After all three agents return:
+After all three agents return, categorize each finding:
 
-1. Present a consolidated summary of all findings, grouped by category (Reuse / Quality / Efficiency)
-2. If issues were found, fix them -- edit the files directly
-3. After fixes, briefly list what was changed
+| Category | Meaning | Action |
+|----------|---------|--------|
+| **FIX** | Real issue, worth fixing now | Edit the code directly |
+| **DEFER** | Real issue, not worth fixing this phase | Record in `deferred.md` with reason |
+| **DISMISS** | Not a real issue (false positive, intentional pattern) | Record one-line in `deferred.md` so future reviews don't re-raise |
 
-Do NOT ask for permission to fix -- just fix. The user invoked /forge-review expecting action, not a report.
+## Step 4: Act
+
+1. Present a consolidated summary with FIX/DEFER/DISMISS tags
+2. Fix all FIX-category items directly
+3. For DEFER and DISMISS items, append to `~/.claude/projects/<project-key>/memory/deferred.md` (create on first use)
+4. After fixes, briefly list what was changed and what was deferred
+
+Do NOT ask for permission to fix FIX items -- just fix. Deferrals are autonomous but visible in the summary -- the user can override.
