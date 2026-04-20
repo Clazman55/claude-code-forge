@@ -41,7 +41,7 @@ Plan Files (~/.claude/plans/) -- Phase-by-phase blueprints, decisions, completio
 Project CLAUDE.md         -- Project identity, structure, coding standards, quality gate
     |
 Project MEMORY.md         -- Phase history, verified patterns, session handoff state
-  |-- Satellite files      -- decisions.md, gotchas.md, etc. (linked from MEMORY.md)
+  |-- Satellite files      -- phase0-architecture.md, phaseN-decisions.md, deferred.md, patterns.md, etc.
 ```
 
 Each layer inherits context from the layer above. When you open a session, Claude loads the full stack -- global instructions, project memory, skill files, whatever's relevant. The result is an instance that behaves as if it has continuity, even though it's brand new.
@@ -72,6 +72,10 @@ The `/orient` skill works here too -- same boot sequence, different context load
 
 > "Read CLAUDE.md and MEMORY.md. We're continuing [project] at [phase]."
 
+### Session Prompt Templates
+
+For operators who prefer explicit control, copy-paste templates for every session type live at `~/.claude/prompts.md` -- home orientation, brainstorming, Phase 0, handoff, resume, post-testing loop, reactivation, project wrap. The slash command tools automate most of what these prompts describe, but the templates are there when precision is required.
+
 ---
 
 ## 4. The Operator and the Instance
@@ -94,9 +98,9 @@ Skills are modular technique libraries stored at `~/.claude/skills/`, with a mas
 
 When a project starts, relevant skills are copied to the project's `docs/` folder. During implementation, only these project copies get updated with `[verified in Phase N]` tags. The canonical copies in `~/.claude/skills/` are updated only at project wrap or stabilize -- the project builds its own knowledge first, then exports the refined product back to the shared library. This one-way flow during implementation prevents half-baked patterns from polluting the master copies.
 
-The current catalog contains 22 skill files spanning PowerShell, HTML5/JavaScript, C#/.NET, creative writing, testing methodology, project lifecycle, knowledge architecture, AI-friendly code architecture, and reusable components.
+The current catalog contains 25 skill files spanning PowerShell (7), HTML5/JavaScript (5), C#/.NET and MonoGame (4), creative writing (3), testing methodology, project lifecycle, knowledge architecture, AI-friendly code architecture, subagent dispatch patterns, and reusable components.
 
-The system extends beyond code. A creative writing capability was built from empirical analysis of a 10-story, 4-essay corpus -- diagnosing Claude's systematic fiction weaknesses, synthesizing them into a pattern taxonomy, and distilling that into constraints for drafting and a reference skill for analysis. The same diagnostic loop that governs code quality governs prose quality.
+The system extends beyond code. A three-tier creative writing capability was built from empirical analysis of a 10-story, 4-essay corpus -- diagnosing Claude's systematic fiction weaknesses, synthesizing them into a pattern taxonomy, and distilling that into three operational tiers: Tier 0 (generative outlining frameworks), Tier 1 (active constraints for drafting and revision), and Tier 2 (analysis methodology and the full anti-pattern catalog). The same diagnostic loop that governs code quality governs prose quality. The `/creative` session tool activates the appropriate tier and mode (outline, draft, review, revise).
 
 Two specialized extensions complement the pattern-level skills:
 
@@ -115,15 +119,15 @@ These are not skill files (pattern libraries). They're SKILL.md files that live 
 | Tool | What It Automates |
 |------|-------------------|
 | `/orient` | Session boot -- detects session type, reads context files, presents status |
-| `/kickoff` | Phase kickoff -- reads plan/code/memory, runs plan critique (subagent), presents gameplan with tagged questions |
-| `/phase-wrap` | Phase completion -- updates CLAUDE.md, project skills, memory/satellites, commits |
+| `/kickoff` | Phase kickoff -- reads plan/code/memory, runs Phase 0 assumption check, presents gameplan with tagged questions, creates phase satellite |
+| `/phase-wrap` | Phase completion -- reads phase satellite, checks deferred.md, updates CLAUDE.md, project skills, memory/satellites, offers compaction, commits |
 | `/test-audit` | Testing audit -- reviews non-trivial phase failures, extracts root causes to testing satellite |
-| `/simplify` | Code review -- three parallel agents (reuse, quality, efficiency) on phase-changed files |
-| `/phase0` | Phase 0 execution -- research, scaffold, plan, skills, bootstrap entry |
-| `/stabilize` | Project shelf -- satellite audit, canonical sync, knowledge capture |
-| `/wrap` | Project close -- final review, canonical sync, cold storage move |
+| `/simplify` | Code review -- three parallel agents (reuse, quality, efficiency) on phase-changed files, FIX/DEFER/DISMISS categorization |
+| `/phase0` | Phase 0 execution -- research, scaffold, plan, skills, architecture satellite, bootstrap entry |
+| `/stabilize` | Project shelf -- deferred findings review, satellite audit, canonical sync, knowledge capture |
+| `/wrap` | Project close -- deferred findings review (all items resolve), canonical sync, cold storage transfer |
 | `/brainstorm` | Ideas exploration -- reads ideas folder, surveys accumulated work, enters open-ended mode |
-| `/creative` | Creative writing sessions -- activates drafting, review, or revision mode with appropriate skill |
+| `/creative` | Creative writing sessions -- activates outline, draft, review, or revision mode (three-tier skill system) |
 | `/snapshot` | Session state capture -- writes structured state file to disk, presents compact handoff message |
 | `/chronicle` | Session log -- appends a log entry to the operator's chronicle |
 | `/regen-doctrine` | Doctrine maintenance -- drift check against source files, markdown update, HTML regeneration |
@@ -135,7 +139,7 @@ The design principle is simple: the doctrine says what to do, the tools do it. E
 
 ## 7. The Project Lifecycle
 
-This section is a summary. The full detail lives in the Claude Project Lifecycle Reference, the companion document to this one. The lifecycle has been validated across 15 projects totalling approximately 150,000+ lines of source code.
+This section is a summary. The full detail lives in the Claude Project Lifecycle Reference, the companion document to this one. The lifecycle has been validated across 15 projects totalling approximately 150,000+ lines of source code and 2,500+ automated tests.
 
 Every project moves through the same sequence:
 
@@ -143,13 +147,13 @@ Every project moves through the same sequence:
 2. **Phase 0** -- research, scaffold, plan, and commit the infrastructure (runs in the home directory session)
 3. **Session handoff** -- open a project session, Claude reads the bootstrap entry from home memory
 4. **Phase N** -- implement, test, pass the quality gate, run the self-verification loop
-5. **Phase completion** -- update CLAUDE.md, extract patterns to project skills, update memory, commit
-6. **Stabilize** (optional) -- capture knowledge and shelf the project for later reactivation
-7. **Project wrap** -- final review, canonical skill sync, move to cold storage
+5. **Phase completion** -- update CLAUDE.md, extract patterns to project skills, update memory and satellites, commit
+6. **Stabilize** (optional) -- satellite audit, canonical sync, shelf for later reactivation. The project stays in active memory.
+7. **Project wrap** -- final review, canonical sync, transfer to cold storage. The project is done.
 
 The distinction between stabilize and wrap matters: stabilize captures knowledge without closing the project (more phases are planned), while wrap closes the record and archives it. Both trigger canonical skill sync. The distinction prevents premature archival of active projects.
 
-At the heart of each phase is a **self-verification loop**: phase kickoff (including plan critique and test plan) -> write code + automated tests (must pass before review) -> update TestingGuide (manual tests, separate from automated) -> user tests -> user reports -> fix failures -> `/simplify` -> fix findings -> `/test-audit` (conditional, if non-trivial failures) -> update CLAUDE.md -> update project skills -> update memory + satellites -> commit.
+At the heart of each phase is a **self-verification loop**: phase kickoff (Phase 0 assumption check, phase satellite creation) -> write code + automated tests (must pass before review, mid-phase decisions recorded) -> update TestingGuide (manual tests, separate from automated) -> user tests -> user reports -> fix failures -> `/simplify` (FIX/DEFER/DISMISS categorization, deferred items to `deferred.md`) -> fix FIX-category findings -> `/test-audit` (conditional) -> scope reduction check -> update CLAUDE.md (`/phase-wrap` reads phase satellite, checks deferred.md) -> update project skills -> update MEMORY.md + satellites -> commit.
 
 The loop is not optional. The operator reviews every phase.
 

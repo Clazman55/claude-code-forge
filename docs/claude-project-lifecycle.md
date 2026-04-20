@@ -8,10 +8,10 @@
 
 Every project built with Claude Code follows the same lifecycle, regardless of language or domain. The structure exists because Claude has no memory between sessions -- without it, each conversation starts from scratch and accumulated knowledge is lost. This lifecycle solves that problem by externalizing everything into files that persist across sessions.
 
-The workflow has been validated across 15 projects totalling approximately 150,000+ lines of source code, spanning PowerShell modules, HTML5 games, C#/.NET applications, incremental games with esbuild bundling, a MonoGame arena RTS, and a public methodology repository.
+The workflow has been validated across fifteen projects totalling approximately 150,000 lines of source code and 2,500+ automated tests, spanning PowerShell modules, HTML5 Canvas games, C#/.NET desktop applications (WPF, MonoGame), system utilities, incremental games with esbuild bundling, and a public methodology repository.
 
 ```
-Phase 0 (Home Session)       Research, plan, scaffold, create skills
+Phase 0 (Home Session)       Research, plan, scaffold, create skill files
         |
         v
 Session Handoff              Open project session, Claude reads bootstrap info
@@ -20,55 +20,61 @@ Session Handoff              Open project session, Claude reads bootstrap info
 Phase 1..N (Project)         Implement, test, review, verify (loop per phase)
         |
         v
-Stabilize (optional)         Satellite audit, canonical sync, shelf for later reactivation
+Stabilize (optional)         Satellite audit, canonical sync, shelf for reactivation
         |
         v
-Project Wrap                 Final review, skills sync, cold storage
+Project Wrap                 Final review, skills sync, cold storage transfer
 ```
 
 **Phase Outputs:**
 
 | Stage | Deliverables |
 |-------|-------------|
-| Phase 0 | Skill files, CLAUDE.md, TestingGuide skeleton, plan file, directory structure |
+| Phase 0 | Skill files, CLAUDE.md, TestingGuide skeleton, plan file, directory structure, architecture satellite |
 | Session Handoff | Project memory created, context loaded from bootstrap entry |
 | Each Phase 1..N | Working code, updated TestingGuide, updated CLAUDE.md, skills tags, updated MEMORY.md |
 | Stabilize | Canonical skills synced, project memory marked "Stabilized", stays in active memory |
 | Project Wrap | Tagged canonical skills, updated index, home memory moved to cold storage |
 
-**Philosophy:** Systematic, phased, quality-gated. Phase 0 is scaffolding only -- no application code. The self-verification loop runs after every phase without exception. The plan file is write-once; CLAUDE.md is the living document. Projects may be stabilized (shelved with knowledge captured) or wrapped (completed and cold-storaged).
+> **Note:** Phase 0 is scaffolding only -- no application code. The self-verification loop runs after every phase without exception. The plan file is write-once; CLAUDE.md is the living document. Projects may be stabilized (shelved with knowledge captured) or wrapped (completed and archived to cold storage).
 
 ---
 
 ## 1. Phase 0: Research & Planning
 
-Phase 0 is where you do everything *except* write application code. It runs in the home directory session -- a workspace scoped for cross-project work like skills research, planning, and scaffolding. The reason for this separation is that each Claude session has its own memory folder, and the home session's memory serves as the bridge between projects.
+Phase 0 runs in the **home directory session** at `~/.claude/projects/[home-session]/`. This session is scoped for cross-project work: skills research, planning, and scaffolding. No application code is written here.
 
-> **Do Not Write Application Code in Phase 0.** Deliverables are: skill files, CLAUDE.md, TestingGuide skeleton, plan file, and directory structure. Nothing else. Skills can be refined during implementation -- don't over-engineer Phase 0.
+> **Do Not Write Application Code in Phase 0.** The deliverables are: skill files, CLAUDE.md, TestingGuide skeleton, plan file, directory structure, and architecture satellite. Nothing else.
 
 ### Steps
 
-1. **Assess existing codebase** (if rewriting) -- Read original code, document what works and what changes. Create an assessment document for large codebases.
-2. **Check skills index** -- Read `~/.claude/skills/index.md`. Cross-reference the plan's technical requirements against the full index (registry -> cim-wmi, testing -> pester, GUI -> wpf, etc.). Don't trust an idea file's skill list as complete.
-3. **Check components index** -- Read `~/.claude/skills/components-index.md`. Identify reusable implementations for the project's tech stack. Reference specific components in the plan file so the implementation instance knows what's already been built and tested.
-4. **Research and create new skills** -- Web search + docs for the tech stack. Follow the canonical format: intro with provenance, table of contents, numbered sections, code examples, anti-patterns, gotchas table, checklist. **If entering an unfamiliar domain** (new language, framework, or API), prototype the riskiest technical assumption before plan mode -- under 50 lines, answering one feasibility question ("can the toolchain build and run," "does this API return what we need"). If the prototype fails, raise it before the architecture commits to the assumption.
-5. **Update skills index** -- Add new skills to `index.md` with descriptions and dependency mappings.
-6. **Use plan mode for architectural decisions** -- When Phase 0 hits meaningful decisions (tech stack, runtime target, module structure, key tradeoffs), enter plan mode so the user gets the interactive UI. Plain Q&A is a fallback, not the default. Plan file must include test deliverables per phase (which automated framework, what coverage expectations).
-7. **Create project directory** -- Standard structure matching the project type (see Directory Structures section). Include `.gitignore` (exclude `.claude/`, runtime artifacts, credentials). Run `git init` and make an initial commit.
-8. **Copy relevant skills to `docs/`** -- These become the project's working copies that accumulate `[verified in Phase N]` tags.
-9. **Write CLAUDE.md** from the template (see CLAUDE.md Template section).
-10. **Write TestingGuide.html** from the template (see Testing Methodology section).
-11. **Add bootstrap entry** to home directory memory -- project name, location, plan file path, applicable skills, starting phase.
-12. **Create plan file** at `~/.claude/plans/[plan-name].md` -- Phase 0 summary + subsequent phase outlines. This file is write-once. Each phase outline must include test deliverables (automated framework, coverage expectations).
-13. **Commit Phase 0** -- `git add` all scaffolding files and commit "Phase 0: Project infrastructure". Global files (`~/.claude/`) are not git-tracked but are updated; the project commit captures the project-side artifacts.
+1. **Assess existing codebase** (if rewriting) -- Read the original code. Document what works and what must change. Create an assessment document for large codebases.
+2. **Check skills index** -- Read `~/.claude/skills/index.md`. Cross-reference the plan's technical requirements against the full catalog. Do not trust an idea file's skill list as complete -- the index is the authoritative source.
+3. **Check components index** -- Read `~/.claude/skills/components-index.md`. Identify reusable implementations for the project's tech stack. Reference specific components in the plan file so the implementation instance knows what has already been built and tested.
+4. **Research and create new skill files** -- Web search and documentation for the tech stack. Follow the canonical format: introduction with provenance, table of contents, numbered sections, code examples, anti-patterns, gotchas table, checklist. **If entering an unfamiliar domain** (new language, framework, or API), prototype the riskiest technical assumption before plan mode -- under 50 lines, answering one feasibility question. If the prototype fails, raise it before the architecture commits to the assumption.
+5. **Update skills index** -- Add new skill files to `index.md` with descriptions and dependency mappings.
+6. **Set dependency policy** -- Does the built artifact need to be self-contained (no runtime prerequisites beyond the target machine)? Record the decision in the project CLAUDE.md.
+7. **Use plan mode for architectural decisions** -- When Phase 0 reaches meaningful decision points (tech stack, runtime target, module structure, key tradeoffs), enter plan mode so the operator gets the interactive UI for review. Plain Q&A is a fallback, not the default. The plan file must include test deliverables per phase.
+8. **Pattern fit check** (before writing the plan) -- Ask explicitly: "What prior project am I reaching for? Why?" / "What is different about THIS project that might break that pattern?" / "Which architectural defaults am I carrying? Are they justified here?" Record answers in the plan file's Frame Audit section.
+9. **Plan critique agent** -- After drafting the plan but BEFORE presenting to the operator, run a plan critique agent against the draft (dependencies, sizing, assumptions, skill gaps, regression). Include findings in the plan presentation.
+10. **Create project directory** -- Standard structure matching the project type (see Directory Structures section). Include `.gitignore` (exclude `.claude/`, runtime artifacts, credentials). Run `git init` and make an initial commit.
+11. **Copy relevant skill files to `docs/`** -- These become the project's working copies that accumulate `[verified in Phase N]` tags during implementation.
+12. **Write CLAUDE.md** from the template (see CLAUDE.md Template section).
+13. **Write TestingGuide.html** from the template (see Testing Methodology section).
+14. **Add bootstrap entry** to home directory memory -- project name, location, plan file path, applicable skills, starting phase.
+15. **Create plan file** at `~/.claude/plans/[plan-name].md` -- Phase 0 summary plus subsequent phase outlines. This file is write-once. Each phase outline must include test deliverables (automated framework, coverage expectations).
+16. **Create project memory folder and architecture satellite** -- Create `~/.claude/projects/<project-key>/memory/` and write `phase0-architecture.md` with structured decisions. Each decision records Default, Break condition, Pattern source, and Why chosen. See `code-architecture-for-ai.md` Phase 0 Decision Points for the standard questions.
+17. **Commit Phase 0** -- `git add` all scaffolding files, commit "Phase 0: Project infrastructure". Global files (`~/.claude/`) are not tracked in the project repo; the commit captures the project-side artifacts.
 
-**Skills System:** Canonical copies live at `~/.claude/skills/` -- the master, shared across all projects. Project copies live at `[ProjectRoot]/docs/` -- working copies that ship with the project. Tags flow both directions: when a project copy gets a `[verified in Phase N]` tag, the canonical copy gets the same tag.
+**Phase 0 Deliverables:** Skill files, CLAUDE.md, TestingGuide skeleton, plan file, directory structure, architecture satellite. Nothing else. Skills can be refined during implementation -- do not over-engineer the scaffolding.
+
+**Skills System:** Canonical copies live at `~/.claude/skills/` -- the master library, shared across all projects. Project copies live at `[ProjectRoot]/docs/` -- working copies that ship with the project. Verification tags flow in one direction during implementation: project copies get tagged. Canonical copies get tagged at wrap or stabilize.
 
 ---
 
 ## 2. CLAUDE.md Template
 
-The CLAUDE.md is the contract between Claude and the project. It lives at the project root and is the first thing Claude reads at every session start. A well-written CLAUDE.md means a new Claude instance can orient itself and start working without any additional context. A poorly written one means you'll spend the first ten minutes of every session re-explaining your project.
+The CLAUDE.md is the contract between Claude and the project. It lives at the project root and is read at every session start. It must be complete enough to bootstrap a session with no other context -- if Claude reads this file and nothing else, it should be able to orient itself and begin work.
 
 ```markdown
 # [Project Name]
@@ -77,13 +83,15 @@ The CLAUDE.md is the contract between Claude and the project. It lives at the pr
 
 ## Target Runtime
 - **Runtime:** [Browser versions / PowerShell 7+ / etc.]
-- [Constraints: no build tools, no external dependencies, etc.]
+- **Dependency policy:** [Self-contained (no runtime prerequisites) / framework packages permitted / etc. -- set during Phase 0]
 - [File structure: single file / module architecture]
 
 ## Directory Structure
 [ASCII tree showing all files and folders]
 
 ## Key Architectural Decisions
+[Summary entries. Full decisions with defaults, break conditions, and pattern sources
+live in `phase0-architecture.md` in the project memory folder.]
 - [Decision 1 with rationale]
 - [Decision 2 with rationale]
 
@@ -113,16 +121,17 @@ Run after every phase. Check:
 - [ ] [Testable item 2]
 
 ## Self-Verification Loop (per phase)
-1. Phase kickoff -- read plan/code/memory, run plan critique (subagent), present gameplan (incl. test plan) + numbered questions/suggestions tagged [Design] [Clarification] [Suggestion] [Risk] [Critic], wait for user. Pseudocode gate for complex algorithms: include pseudocode tagged [Approval Required], do not implement until approved.
-2. Write code + automated tests (Pester/xUnit/inline) -- run tests, fix failures. Code is NOT presented for review until automated tests pass.
-3. Update TestingGuide.html -- manual test steps for user-facing behavior (the operator's inspection, separate from automated tests)
+1. Phase kickoff -- `/kickoff` skill: read plan/code/memory, run Phase 0 assumption check, present gameplan (incl. test plan) + numbered questions/suggestions tagged [Design] [Clarification] [Suggestion] [Risk] [Critic], wait for user. Pseudocode gate for complex algorithms. Creates phase satellite (`phaseN-decisions.md`) from Q&A.
+2. Write code + automated tests (Pester/xUnit/inline) -- run tests, fix failures. Code is NOT presented for review until automated tests pass. Record significant mid-phase decisions in the phase satellite.
+3. Update TestingGuide.html -- manual test steps for user-facing behavior (separate from automated tests)
 4. User follows guide
 5. User reports results
 6. Fix failures
-7. /simplify
-8. Fix issues
+7. /simplify -- three-agent review. Categorize findings as FIX/DEFER/DISMISS. Deferred and dismissed items go to `deferred.md` satellite.
+8. Fix FIX-category issues
 8a. /test-audit (conditional) -- if non-trivial failures this phase, extract testing patterns to satellite
-9. Update CLAUDE.md
+8b. Scope reduction check -- compare plan requirements against deliverables, verify new components are wired not just present
+9. Update CLAUDE.md -- `/phase-wrap` skill handles steps 8a-11 + commit. Reads phase satellite as source of truth. Checks `deferred.md` for resolved items.
 10. Update project skills (docs/) with verified patterns -- canonical sync at wrap only
 11. Update MEMORY.md + satellites, then next phase
 
@@ -138,131 +147,131 @@ Run after every phase. Check:
 - [ ] Phase 2: [Description]
 ```
 
-Every section in the template serves a specific purpose. If a section doesn't pull its weight, it's wasting context tokens:
+**Section Purposes:**
 
 | Section | Purpose |
 |---------|---------|
-| Target Runtime | Pins the deployment target. Eliminates ambiguous "should work on..." advice. |
+| Target Runtime | Pins the deployment target. Eliminates ambiguous "should work on..." guidance. |
 | Directory Structure | ASCII tree. Claude knows the file layout without exploring. |
-| Key Architectural Decisions | Non-obvious choices with rationale. Prevents re-litigating each session. |
+| Key Architectural Decisions | Non-obvious choices with rationale. Prevents re-litigation each session. |
 | Code Organization | Section/module list. Claude navigates by number, not by searching. |
-| Domain-Specific Rules | Behavior invariants -- collision rules, business logic. Must not change. |
-| AI Architecture Notes | File sizing, complexity hotspots, intentional patterns, tight couplings. Prevents AI from "fixing" deliberate choices. |
-| Coding Standards | References to skill files + project-specific rules. |
+| Domain-Specific Rules | Behavioral invariants -- collision rules, business logic. Must not change. |
+| AI Architecture Notes | File sizing, complexity hotspots, intentional patterns, tight couplings. Prevents Claude from "fixing" deliberate choices. |
+| Coding Standards | References to skill files plus project-specific rules. |
 | Quality Gate | Testable checklist. Every item maps to a TestingGuide step. |
-| Self-Verification Loop | Quick-reference for the 12-step cycle. Same across all projects. |
+| Self-Verification Loop | Quick-reference for the review cycle. Same across all projects. |
 | Implementation Phases | Phase registry. `[x]` done, `[ ]` pending, `~~text~~` dropped. |
 
 ---
 
 ## 3. Directory Structures
 
-Consistent directory structure means Claude can navigate any project without exploration. These templates cover three common patterns -- choose the one that matches your project's complexity and tech stack.
-
 ### Single-File Application (HTML5)
 
 ```
 [ProjectRoot]/
-├── .gitignore              # Git ignore rules
-├── ProjectName.html        # The entire application
-├── CLAUDE.md               # Project instructions
-├── docs/
-│   ├── skill.md            # Domain skill (project copy)
-│   ├── js-skill.md         # Language skill (project copy)
-│   └── existing/           # Reference material (old code, specs)
-└── tests/
-    ├── TestingGuide.html   # Manual testing checklist
-    └── [test files]        # Automated tests if applicable
++-- .gitignore              # Git ignore rules
++-- ProjectName.html        # The entire application
++-- CLAUDE.md               # Project instructions
++-- docs/
+|   +-- skill.md            # Domain skill (project copy)
+|   +-- js-skill.md         # Language skill (project copy)
+|   +-- existing/           # Reference material (old code, specs)
++-- tests/
+    +-- TestingGuide.html   # Manual testing checklist
+    +-- [test files]        # Automated tests if applicable
 ```
 
 ### Multi-File Module (PowerShell)
 
 ```
 [ProjectRoot]/
-├── ProjectName.ps1         # Entry point / launcher
-├── Build-Release.ps1       # Build and packaging script
-├── CLAUDE.md               # Project instructions
-├── config/
-│   └── defaults.json       # Default configuration
-├── src/
-│   ├── ProjectName.psd1    # Module manifest
-│   ├── ProjectName.psm1    # Root module (dot-sourcing)
-│   ├── Core/               # Core functions
-│   ├── Feature1/           # Feature module
-│   └── GUI/                # Optional GUI layer
-├── tests/
-│   ├── Invoke-QualityCheck.ps1
-│   ├── Core.Tests.ps1
-│   └── Feature1.Tests.ps1
-├── docs/
-│   ├── skill.md
-│   └── ps-skill.md
-└── logs/
++-- ProjectName.ps1         # Entry point / launcher
++-- Build-Release.ps1       # Build and packaging script
++-- CLAUDE.md               # Project instructions
++-- config/
+|   +-- defaults.json       # Default configuration
++-- src/
+|   +-- ProjectName.psd1    # Module manifest
+|   +-- ProjectName.psm1    # Root module (dot-sourcing)
+|   +-- Core/               # Core functions
+|   +-- Feature1/           # Feature module
+|   +-- GUI/                # Optional GUI layer
++-- tests/
+|   +-- Invoke-QualityCheck.ps1
+|   +-- Core.Tests.ps1
+|   +-- Feature1.Tests.ps1
++-- docs/
+|   +-- skill.md
+|   +-- ps-skill.md
++-- logs/
 ```
 
 ### Multi-File Application (HTML5 + esbuild)
 
-When a single-file app outgrows its architecture (typically 5,000+ lines), split into ES6 modules with esbuild bundling.
+When a single-file application outgrows its architecture (typically 5,000+ lines), the project splits into ES6 modules with esbuild bundling.
 
 ```
 [ProjectRoot]/
-├── .gitignore              # Git ignore rules
-├── index.html              # Dev entry point (ES6 module imports)
-├── build.ps1               # esbuild bundle -> inlines CSS+JS -> dist/
-├── serve.ps1               # esbuild --serve for dev (localhost:8000)
-├── CLAUDE.md               # Project instructions
-├── archive/                # Pre-split single-file backup
-│   └── ProjectName-v1-single-file.html
-├── src/
-│   ├── balance.js          # Constants, config, cost tables
-│   ├── util.js             # Shared helpers
-│   ├── state.js            # All mutable state (G namespace)
-│   ├── [subsystem].js      # Feature modules
-│   ├── engine.js           # Game loop / tick driver
-│   ├── render/             # Render modules (one per tab/view)
-│   │   └── render-[tab].js
-│   ├── ui.js               # DOM event handlers
-│   ├── main.js             # Wiring, init, entry point
-│   └── styles.css          # Extracted CSS (inlined by build)
-├── tools/
-│   └── esbuild.exe         # Standalone binary (no npm)
-├── dist/
-│   └── ProjectName.html    # Production: single file, file:// compatible
-├── docs/
-│   ├── skill.md            # Domain skill (project copy)
-│   └── js-skill.md         # Language skill (project copy)
-└── tests/
-    └── TestingGuide.html   # Manual testing checklist
++-- .gitignore              # Git ignore rules
++-- index.html              # Dev entry point (ES6 module imports)
++-- build.ps1               # esbuild bundle -> inlines CSS+JS -> dist/
++-- serve.ps1               # esbuild --serve for dev (localhost:8000)
++-- CLAUDE.md               # Project instructions
++-- archive/                # Pre-split single-file backup
+|   +-- ProjectName-v1-single-file.html
++-- src/
+|   +-- balance.js          # Constants, config, cost tables
+|   +-- util.js             # Shared helpers
+|   +-- state.js            # All mutable state (G namespace)
+|   +-- [subsystem].js      # Feature modules
+|   +-- engine.js           # Game loop / tick driver
+|   +-- render/             # Render modules (one per tab/view)
+|   |   +-- render-[tab].js
+|   +-- ui.js               # DOM event handlers
+|   +-- main.js             # Wiring, init, entry point
+|   +-- styles.css          # Extracted CSS (inlined by build)
++-- tools/
+|   +-- esbuild.exe         # Standalone binary (no npm)
++-- dist/
+|   +-- ProjectName.html    # Production: single file, file:// compatible
++-- docs/
+|   +-- skill.md            # Domain skill (project copy)
+|   +-- js-skill.md         # Language skill (project copy)
++-- tests/
+    +-- TestingGuide.html   # Manual testing checklist
 ```
 
-The `docs/existing/` folder holds reference material -- original code, specs, assessment documents. It is never modified during implementation. The `tests/` folder gets `TestingGuide.html` at minimum; automated test files are added if the tech stack supports it.
+**Key conventions:** Shared mutable state lives on a `G` namespace object. Circular dependencies are resolved via three strategies: shared functions in state.js, `G.fn()` wiring in main.js, and `setXDeps()` injection for render modules. Development uses ES6 modules via `serve.ps1`; production bundles into a single distributable HTML via `build.ps1`.
+
+The `docs/existing/` folder holds reference material -- original code, specs, assessment documents. It is never modified during implementation. The `tests/` folder receives `TestingGuide.html` at minimum; automated test files are added if the tech stack supports a runner.
 
 ---
 
 ## 4. Session Handoff
 
-Phase 0 runs in the home directory session. Implementation runs in a dedicated project session. The reason for the split is scoping: the home session is for cross-project work (skills, research), while the project session focuses on one codebase. Each session gets its own memory folder, keeping context focused.
+Phase 0 runs in the home directory session. Implementation runs in a dedicated project session. The context window of each session stays scoped to its purpose -- home for cross-project work, project for focused implementation.
 
 ### Handoff Sequence
 
-1. **Phase 0 completes** in the home directory session. Bootstrap info is in home directory memory.
-2. **User opens new session** at `[ProjectRoot]`.
-3. **User runs `/orient`** -- the skill detects the project context, reads CLAUDE.md, finds the bootstrap entry in home directory memory, reads the plan file, and presents a status report. This is the standard path.
+1. **Phase 0 completes** in the home directory session. Bootstrap info is recorded in home directory memory.
+2. **The operator opens a new session** at `[ProjectRoot]`.
+3. **The operator runs `/orient`** -- the skill detects the project context, reads CLAUDE.md, locates the bootstrap entry in home directory memory, reads the plan file, and presents a status report. This is the standard path.
 4. **Claude creates project memory** at `~/.claude/projects/[project-key]/memory/MEMORY.md` with initial status.
 5. **Implementation begins** at Phase 1.
 
 ### Manual Handoff (Fallback)
 
-If `/orient` is not available, Claude provides a handoff prompt at the end of Phase 0 for the user to paste into the new session:
+If `/orient` is not available, the Phase 0 instance provides a handoff prompt at session end for the operator to paste into the new session:
 
 ```
 We're working on [ProjectName] out of [ProjectRoot]. [One-line description].
 Check the global CLAUDE.md for workflow context, then read:
 
 1. Home directory memory for the bootstrap entry
-   (~/.claude/projects/[home-session]/memory/MEMORY.md)
-2. Plan file at ~/.claude/plans/[plan-name].md
-3. Project CLAUDE.md at [ProjectRoot]/CLAUDE.md
+   (`~/.claude/projects/[home-session]/memory/MEMORY.md`)
+2. Plan file at `~/.claude/plans/[plan-name].md`
+3. Project CLAUDE.md at `[ProjectRoot]/CLAUDE.md`
 4. `git log --oneline` to confirm project state
 
 Phase 0 is complete and tested. Start Phase [N].
@@ -272,10 +281,10 @@ Phase 0 is complete and tested. Start Phase [N].
 
 | File | What Claude Gets |
 |------|-----------------|
-| `~/.claude/CLAUDE.md` | User preferences, workflow rules, skills reference, lifecycle protocol |
-| Home directory `MEMORY.md` | Bootstrap entry: project location, plan file path, applicable skills |
+| `~/.claude/CLAUDE.md` | Operator preferences, workflow rules, skills reference, lifecycle protocol |
+| Home directory `MEMORY.md` | Bootstrap entry: project location, plan file path, applicable skill files |
 | Plan file | Phase outlines, architectural decisions from Phase 0 research |
-| `[ProjectRoot]/CLAUDE.md` | Project-specific rules, quality gate, code organization, domain rules |
+| `[ProjectRoot]/CLAUDE.md` | Project-specific rules, quality gate, code organization, domain constraints |
 
 ### Bootstrap Entry Format
 
@@ -284,7 +293,7 @@ Phase 0 is complete and tested. Start Phase [N].
 - [Brief description]
 - Location: `[ProjectRoot]`
 - Plan file: `~/.claude/plans/[plan-name].md`
-- Skills: [which canonical skills apply]
+- Skills: [which canonical skill files apply]
 - Start at: Phase 1
 ```
 
@@ -292,49 +301,48 @@ Phase 0 is complete and tested. Start Phase [N].
 
 ## 5. Self-Verification Loop
 
-This is the core quality cycle. It runs after every implementation phase without exception. The loop exists because Claude can introduce subtle regressions, and without systematic verification, problems compound across phases. Twelve steps, no shortcuts.
-
-Two things to note: automated tests (step 2) and manual tests (step 3) are *separate activities with separate owners*. Claude writes and runs automated tests before presenting code for review. The operator runs manual tests via the TestingGuide to verify user-facing behavior.
+The core quality cycle. This is the mechanism that prevents the project from producing unchecked work. It runs after every implementation phase, without exception. No shortcuts. No "we'll test it later."
 
 ```
-Phase kickoff --> Write code --> Update TestingGuide --> User tests --> User reports
-                                                                            |
-     <--------------------------------------------------------------------------
+Phase kickoff ----> Write code ----> Update TestingGuide ----> User tests ----> User reports
+                                                                                    |
+     <-----------------------------------------------------------------------------|
      v
-Fix failures --> /simplify --> Fix findings --> /test-audit (conditional)
-                                                      |
-     <------------------------------------------------
+Fix failures ----> /simplify ----> Fix findings ----> Update CLAUDE.md
+                                                          |
+     <----------------------------------------------------|
      v
-Update CLAUDE.md --> Update project skills --> Update MEMORY.md + satellites --> Commit --> Next phase
+Update project skills ----> Update MEMORY.md + satellites ----> Commit ----> Next phase
 ```
 
 | Step | What Happens |
 |------|-------------|
-| 1. Phase kickoff | Read plan/code/memory. Run plan critique (subagent). Present gameplan (incl. test plan) + numbered questions/suggestions tagged [Design] [Clarification] [Suggestion] [Risk] [Critic]. Pseudocode gate for complex algorithms (tagged [Approval Required]). Wait for user. |
-| 2. Write code + automated tests | Implement features per agreed gameplan. Write automated tests (Pester/xUnit/inline). Run tests, fix failures. Code is NOT presented for review until automated tests pass. |
-| 3. Update TestingGuide | Add action / expect / if-fail steps for user-facing behavior. Manual tests are the operator's inspection -- separate activity from automated tests, separate owner. |
-| 4. User tests | Opens TestingGuide.html, runs through steps, checks boxes |
-| 5. User reports | Clicks "Copy Report", pastes formatted results into conversation |
-| 6. Fix failures | Address every TODO item from the report |
-| 7. Run /simplify | Three-agent review: code reuse, code quality, efficiency |
-| 8. Fix findings | Real issues get fixed; false positives noted and skipped |
+| 1. Phase kickoff | `/kickoff` skill: Read plan/code/memory. Run Phase 0 assumption check (verifies current phase scope against architecture satellite). Present gameplan (incl. test plan) + numbered questions/suggestions tagged [Design] [Clarification] [Suggestion] [Risk] [Critic]. Pseudocode gate for complex algorithms (tagged [Approval Required]). Create phase satellite (`phaseN-decisions.md`) from Q&A outcomes. Wait for the operator. |
+| 2. Write code + automated tests | Implement features per the agreed gameplan. Write automated tests (Pester/xUnit/inline). Run tests, fix failures. Code is NOT presented for review until automated tests pass. Record significant mid-phase decisions in the phase satellite as they happen. |
+| 3. Update TestingGuide | Add action / expect / if-fail steps for user-facing behavior. Manual tests are the operator's inspection -- a separate activity from automated tests, with a separate owner. |
+| 4. User tests | The operator opens TestingGuide.html, runs through the steps, checks the boxes. |
+| 5. User reports | Clicks "Copy Report", pastes formatted results into the conversation. |
+| 6. Fix failures | Address every TODO item from the report. |
+| 7. Run /simplify | Three-agent review: code reuse, code quality, efficiency. Categorize findings as FIX (fix now), DEFER (address in a later phase), or DISMISS (false positive / acceptable). Deferred and dismissed items are appended to `deferred.md` satellite with rationale. |
+| 8. Fix findings | FIX-category issues are resolved. DEFER/DISMISS items are recorded, not acted upon. |
 | 8a. Testing audit | `/test-audit` (conditional): If non-trivial failures occurred this phase, review failures, classify root causes, extract patterns to testing satellite (`testing-patterns.md`). |
-| 9. Update CLAUDE.md | Mark phase complete, add decisions, update code organization. |
-| 10. Update project skills | Project copies (`docs/`) only -- add `[verified in Phase N]` tags. Canonical sync at stabilize/wrap. |
-| 11. Update MEMORY.md + satellites | Status, decisions, review findings, gotchas -- migrate detail to satellites when MEMORY.md grows |
+| 8b. Scope reduction check | Compare plan file requirements against actual deliverables. Flag anything specified in the plan but delivered as stub, placeholder, TODO, or "v1". Verify new components are wired (called, connected, read), not just present. |
+| 9. Update CLAUDE.md | `/phase-wrap` handles steps 8a-11 + commit. Reads phase satellite as source of truth for decisions made this phase. Checks `deferred.md` for items resolved during implementation. Promotes permanent decisions to CLAUDE.md. |
+| 10. Update project skills | Project copies (`docs/`) only -- add `[verified in Phase N]` tags. Canonical sync happens at stabilize or wrap. |
+| 11. Update MEMORY.md + satellites | Status, decisions, review findings, gotchas. Migrate detail to satellites when MEMORY.md grows. |
 | 12. Commit phase | `git add` changed files, commit "Phase N: [description]". Clean working tree before next phase. |
 
-> **Step 1 Sets the Tone.** The phase kickoff ensures alignment before code is written. The plan critique provides genuine adversarial review. Present a gameplan, surface decisions and risks, and wait for user confirmation. No coding before alignment.
+> **Note:** Step 1 sets the tone. The phase kickoff ensures alignment before a single line of code is written. Present the gameplan, surface decisions and risks, and wait for operator confirmation. No implementation before alignment.
 
-> **Step 10 Is Not Optional.** Every phase must extract patterns into project skills (`docs/`). Canonical skills (`~/.claude/skills/`) are updated at project wrap only -- the project builds its own knowledge, then exports the refined product at the end.
+> **Note:** Step 10 is not optional. Every phase must extract patterns into project skills (`docs/`). Canonical skill files (`~/.claude/skills/`) are updated at wrap only -- the project builds its own knowledge, then exports the refined product at the end.
 
 ---
 
 ## 6. Quality Gate
 
-The quality gate is a checklist in CLAUDE.md where every item is testable and maps to one or more TestingGuide steps. Vague items like "code quality is good" don't belong here -- if you can't observe the result, you can't verify it.
+The quality gate is a checklist in CLAUDE.md. Every item is testable. Every item maps to one or more TestingGuide steps. It is the contractual definition of "done" for each phase.
 
-**Rules:** Testable (has an observable action and expected result). Specific (names the exact behavior, not a general attribute). Negative when needed ("Wall collision stops movement (NOT death)" specifies what should NOT happen). Phase-aware (items added as features are implemented). Droppable (items can be marked dropped but never silently deleted).
+**Rules:** Testable (has an observable action and expected result). Specific (names the exact behavior, not a general attribute). Negative when needed ("Wall collision stops movement (NOT death)" specifies what must NOT happen). Phase-aware (items added as features are implemented). Droppable (items can be marked dropped with strikethrough but never silently deleted).
 
 | Good (Testable) | Bad (Not Testable) |
 |----------------|-------------------|
@@ -349,63 +357,63 @@ The quality gate is a checklist in CLAUDE.md where every item is testable and ma
 - [ ] ~~Touch controls~~ (Phase 6 dropped)
 ```
 
-The quality gate grows phase by phase. Don't try to write the complete gate in Phase 0. Add items as features are implemented. Remove items only by marking them dropped with strikethrough -- never by deleting them. The gate is a historical record.
+The quality gate grows phase by phase. Do not attempt to write the complete gate in Phase 0 -- add items as the features they test are implemented. Remove items only by marking them dropped with strikethrough. The gate is a historical record of what the project committed to and what it delivered.
 
 ---
 
 ## 7. /simplify Review Pass
 
-The `/simplify` skill runs three parallel review agents on code changed during the current phase. It catches the kind of issues that are invisible when you're focused on making features work -- redundant computation, missed reuse opportunities, and code smells that compound over time.
+The `/simplify` skill runs three parallel review agents against code changed during the current phase. It is a quality audit, not a feature review -- the agents examine what was built, not what should have been built.
 
 ### Three Review Agents
 
 | Agent | Focus |
 |-------|-------|
 | Code Reuse | New code duplicating existing utilities; inline logic that could use existing helpers |
-| Code Quality | Redundant state, copy-paste blocks, leaked abstractions, magic numbers, stringly-typed logic |
+| Code Quality | Redundant state, copy-paste blocks, leaked abstractions, magic numbers, stringly-typed logic, test coverage gaps |
 | Efficiency | Redundant computation, missed O(1) opportunities, hot-path bloat, memory leaks, overly broad operations |
 
-**How changes are identified:** Claude uses `git diff HEAD~1` to identify files changed in the last commit, or `git diff` for uncommitted work in progress. Claude reads the full file and audits systematically.
+All three agents flag positive patterns (`[Pattern]`) alongside issues -- techniques worth preserving in project skills.
 
-**What /simplify does NOT do:** Does not make feature suggestions or scope changes. Does not redesign architecture. Does not argue with findings -- real issues get fixed, false positives get noted and skipped.
+**Findings categorization:** After the three agents report, findings are categorized:
+- **FIX** -- real issue, fix now (default for Critical/High severity)
+- **DEFER** -- valid finding but out-of-scope for this phase (record in `deferred.md` with target phase)
+- **DISMISS** -- false positive or acceptable tradeoff (record in `deferred.md` with rationale)
 
-### Real Examples (Snake Project)
+The categorization is autonomous (Claude decides) with operator override capability.
 
-| Phase | Finding |
-|-------|---------|
-| Phase 1 | Delta cap missing (spiral-of-death on tab return); grid cache not cleared on reset |
-| Phase 4 | Hot-path string concat in color comparison -> scalar comparisons; pre-convert hex stops with `.map()` |
-| Phase 5 | O(N) `unshift()` at 78K snake length -> path-index tracking (O(1)) |
-| Phase 5.5 | `const target` shadow bug in updateDemo; duplicated food-eat blocks -> `consumeFood()` helper |
+**How changes are identified:** Claude uses `git diff HEAD~1` to identify files changed in the last commit, or `git diff` for uncommitted work in progress. It reads the full file and audits systematically.
+
+**What /simplify does NOT do:** It does not propose new features or suggest scope changes. It does not redesign architecture. It does not litigate findings -- FIX issues are fixed, DEFER/DISMISS items are recorded and moved on from.
 
 ---
 
 ## 8. Skills Sync Protocol
 
-Skills sync ensures that knowledge learned during implementation doesn't stay trapped in one project. It operates at two different lifecycle points with different rules about what gets updated.
+The skills sync has two distinct operations at different points in the lifecycle. Mixing them -- updating canonical copies during active implementation, or skipping the wrap sync -- corrupts the knowledge chain.
 
 ### Per-Phase: Pattern Extraction (Step 10)
 
 After each phase's `/simplify` pass, extract patterns from the work just completed:
 
 - **Project skills** (`docs/*.md`) -- update with new patterns, add `[verified in Phase N]` tags
-- **Satellites** (`memory/patterns.md`) -- project-specific patterns, bug patterns, anti-patterns
-- **Canonical skills are NOT touched** -- the project builds its own knowledge; export happens at wrap
+- **Satellites** (`memory/patterns.md`) -- project-specific patterns, bug patterns, anti-patterns discovered during implementation
+- **Canonical skill files are NOT touched** -- the project builds its own knowledge; the export happens at wrap
 
 ### Project Wrap: Canonical Sync
 
-At project wrap (or stabilize), the accumulated project knowledge gets audited and synced outward. See Sections 11-12 for the full process.
+At project wrap (or stabilize), the accumulated knowledge is audited and synced outward to the canonical library. See Sections 11-12 for the full process.
 
 ### Severity Classification
 
-When extracting patterns (per-phase or wrap), classify by severity:
+When extracting patterns, classify by severity to determine what warrants preservation:
 
 | Severity | Criterion | Worth Keeping? |
 |----------|-----------|---------------|
 | Critical | Crash-level bug (shadow variable, missing null check) | Always |
 | High | Performance issue (O(n) where O(1) possible), logic error | Always |
 | Medium | Code smell (magic numbers, leaked abstraction, redundant state) | Always |
-| Low | Minor style preference | Only if concise one-liner |
+| Low | Minor style preference | Only if a concise one-liner |
 
 ### Tagging Format
 
@@ -413,15 +421,17 @@ When extracting patterns (per-phase or wrap), classify by severity:
 ### Offscreen Canvas (Pre-rendering) [verified in Phase 1, Phase 7 -- grid cache + food cache with dirty flags]
 ```
 
-Tag goes inline after the section header, inside square brackets. Multiple phases are comma-separated. A brief description of what was verified follows. Tags go on **project copies** (`docs/`) during implementation; canonical copies get tagged at wrap sync.
+The tag goes inline after the section header, inside square brackets. Multiple phases are comma-separated. Tags go on **project copies** (`docs/`) during implementation; canonical copies receive them at wrap sync.
 
-**New sections:** If a phase discovers a pattern not yet in any skill file, add a new section with the `[verified in Phase N]` tag to the project copy. Don't add speculative sections -- only patterns that were actually built and tested.
+**New sections:** If a phase discovers a pattern not yet in any skill file, add a new section with the `[verified in Phase N]` tag to the project copy. Do not add speculative sections -- only patterns that were actually built and tested.
 
 ---
 
 ## 9. Testing Methodology
 
-Manual testing via TestingGuide.html is the primary quality gate when automated runners are impractical. This happens more often than you'd think: `file://` protocol blocks cross-origin requests between HTML files, canvas rendering needs visual verification, and single-file apps have no module system to hook a test runner into.
+Manual testing is the primary quality gate when automated test runners are impractical. The TestingGuide.html is a self-contained, single-file checklist that runs from `file://`.
+
+**When manual testing is appropriate:** `file://` protocol (cross-origin blocks iframe/XHR between HTML files). GUI visual verification (canvas rendering, CSS layout, color schemes). Single-file applications (no module system, no build tools to hook into). No build tools (adding a test runner means adding a dependency the project does not need).
 
 ### TestingGuide Structure
 
@@ -436,7 +446,7 @@ Manual testing via TestingGuide.html is the primary quality gate when automated 
 
 ### Critical: Checkbox + Label ID Pattern
 
-Use `<input id="check-N-M">` and `<label for="check-N-M">` as **separate elements**. Do NOT wrap the input inside the label. The `generateReport()` function uses `label[for="${check.id}"]` to look up step names. Wrapped labels have no `for` attribute -- the report shows raw IDs instead of names.
+Use `<input id="check-N-M">` and `<label for="check-N-M">` as **separate elements**. Do NOT wrap the input inside the label. The `generateReport()` function uses `label[for="${check.id}"]` to look up step names. Wrapped labels have no `for` attribute -- the report shows raw IDs instead of human-readable names.
 
 ```html
 <!-- CORRECT: separate input and label linked by id/for -->
@@ -452,28 +462,28 @@ Use `<input id="check-N-M">` and `<label for="check-N-M">` as **separate element
 Every test step has three parts:
 
 ```html
-<p><span class="action">Do:</span> Open Snake.html, set board to Screensaver, press F3.</p>
+<p><span class="action">Do:</span> Open the app, change a setting, press F3.</p>
 <p><span class="expect">Expect:</span> Performance overlay shows FPS > 30.</p>
-<p><span class="if-fail">If FPS is low:</span> Open F12 Console, check for [PERF] warnings.</p>
+<p><span class="if-fail">If FPS is low:</span> Open F12 Console, check for warnings.</p>
 ```
 
 - **Action** (blue): What the tester does -- name buttons, keys, setting values
 - **Expect** (green): Observable outcome, not implementation detail
-- **If-Fail** (red): Diagnostic steps when expectation is not met
+- **If-Fail** (red): Diagnostic steps when the expectation is not met
 
 ### Copy Report Output Format
 
 ```
-Snake Game -- Testing Guide Report
+[Project] -- Testing Guide Report
 
 Phase 0: Project Infrastructure: 3/3
-  [DONE] Open Snake.html in browser
-  [DONE] Open Snake.test.html in browser
+  [DONE] Open app in browser
+  [DONE] Open test file in browser
   [DONE] Verify project file structure
 
 Phase 1: Core Engine: 7/8
-  [TODO] Run test suite (Snake.test.html)
-  [DONE] Snake moves on screen
+  [TODO] Run test suite
+  [DONE] Core feature works
   ...
 ```
 
@@ -481,25 +491,27 @@ Phase 1: Core Engine: 7/8
 
 ## 10. MEMORY.md Management
 
-Because Claude has no memory between sessions, all project knowledge must be externalized into files. The challenge is that MEMORY.md is auto-loaded with a 200-line truncation limit -- anything past line 200 is silently dropped. This means you need a strategy for what goes where as a project grows.
-
 ### Three-Layer Knowledge Model
 
-Project knowledge naturally stratifies into three layers as complexity grows. See the `knowledge-architecture` skill file for the full specification.
+Project knowledge stratifies into three layers as the project grows in complexity. The model emerges organically -- do not pre-create satellite files for a three-phase project. Let the 200-line pressure drive the split.
+
+See `knowledge-architecture.md` for the full specification.
 
 | Layer | Location | Content | Audience |
 |-------|----------|---------|----------|
-| Skills | `docs/*.md` + `~/.claude/skills/` | Portable, generalized patterns | The craft -- any future project |
-| Satellites | `memory/systems.md`, `patterns.md`, etc. | Project-specific reference (variables, chains, migrations) | The project -- future sessions on this codebase |
+| Skills | `docs/*.md` + `~/.claude/skills/` | Portable, generalized patterns | Any future project of this type |
+| Satellites | `memory/systems.md`, `patterns.md`, etc. | Project-specific reference (variables, chains, migrations) | Future sessions on this codebase |
 | MEMORY.md | `memory/MEMORY.md` | Live index, status, routing pointers | The session -- orient a fresh instance in seconds |
 
-This model emerges organically: Phases 0-2 fit in MEMORY.md alone. By Phase 3-5, patterns split to a satellite. By Phase 5-7, per-subsystem detail splits to systems.md, and MEMORY.md becomes a routing table. Don't pre-create satellite files for a 3-phase project.
+The stratification emerges by phase: Phases 0-2 fit in MEMORY.md alone. By Phase 3-5, patterns split to a satellite. By Phase 5-7, per-subsystem detail splits to systems.md, and MEMORY.md becomes a routing table pointing to the detail files.
 
 ### Project Memory
 
 Lives at `~/.claude/projects/[project-key]/memory/MEMORY.md`. Created during session handoff. Target: 60-120 lines active, under 200 always.
 
-Key sections: Status, Satellite File links, Architecture Overview, Quick Reference, Verified Patterns (top 5-6 with pointer to patterns.md).
+Key sections: Status, Satellite File links, Architecture Overview, Quick Reference, Verified Patterns (top 5-6 with pointer to patterns.md for the full catalog).
+
+Standard satellite files: `phase0-architecture.md` (foundational decisions with defaults, break conditions, pattern sources), `phaseN-decisions.md` (per-phase kickoff Q&A outcomes and mid-phase changes), `deferred.md` (review findings deferred or dismissed, reviewed at stabilize/wrap), `systems.md` (subsystem reference), `patterns.md` (verified patterns and anti-patterns), `testing-patterns.md` (root cause analysis from `/test-audit`).
 
 ### Home Directory Memory
 
@@ -544,7 +556,7 @@ Full details in `completed-projects.md`. Summary index:
 | When | What to Update |
 |------|---------------|
 | After every phase | Status, decisions, review findings |
-| On gotcha discovery | Add immediately -- don't wait for phase end |
+| On gotcha discovery | Add immediately -- do not wait for phase end |
 | On stabilize | Mark "Stabilized", record test counts and line counts. Project stays in active memory. |
 | On project wrap | Final status, move to cold storage, update index line |
 | MEMORY.md approaching 200 lines | Split detail into satellite files; keep main file index-level |
@@ -553,64 +565,66 @@ Full details in `completed-projects.md`. Summary index:
 
 ## 11. Stabilize (Shelf a Project)
 
-Stabilize is for projects that have reached a natural pause point -- MVP complete, milestone achieved -- but are NOT finished. More phases are planned for later. The goal is to capture everything a future Claude instance needs to pick up where you left off.
+When a project reaches a natural pause point -- MVP complete, milestone achieved -- but is NOT finished. More phases are planned. The project is being shelved, not decommissioned.
 
 1. **Final `/simplify` pass** -- review the last phase's changes.
-2. **Satellite audit** -- read ALL satellite files cover to cover. Ask: "Is this generalizable?" Promote generalizable patterns to project skills (`docs/`).
-3. **Components audit** -- check `components-index.md`. Did this project adapt any indexed component? If the adaptation is better (more general, more robust), update the index pointer. Did this project create new reusable components? Add them. Direction is always upward.
-4. **Canonical sync** -- sync project skills (`docs/`) -> canonical skills (`~/.claude/skills/`). Strip project-specific names, generalize code examples, add `[verified]` tags. See the `knowledge-architecture` skill file Section 3 for generalization rules.
-5. **Create meta-skills if discovered** -- if the project revealed new workflow patterns.
-6. **Update `~/.claude/skills/index.md`** -- add any new skills with descriptions and dependencies.
-7. **Update project MEMORY.md** -- mark status as "Stabilized" (not wrapped). Record completed phases, test counts, final line counts. Satellite files preserved for reactivation.
-8. **Update home directory memory** -- update project entry status to "Stabilized". Do NOT move to cold storage -- the project stays in the active section.
-9. **Commit** -- "Stabilize: [project name] -- [milestone summary]"
+2. **Deferred findings review** -- read `deferred.md`. For each DEFER item: resolve (implement now), re-defer with updated rationale, or dismiss. For each DISMISS item: confirm the rationale still holds. All items must have a final disposition.
+3. **Satellite audit** -- read ALL satellite files cover to cover. For each entry, ask: "Is this generalizable beyond this project?" Promote generalizable patterns to project skills (`docs/`).
+4. **Components audit** -- check `components-index.md`. Did this project adapt any indexed component? If the adaptation is superior, update the index pointer. Did this project create new reusable components? Add them.
+5. **Canonical sync** -- sync project skills (`docs/`) to canonical skill files (`~/.claude/skills/`). Strip project-specific names, generalize code examples, add `[verified]` tags. See `knowledge-architecture.md` Section 3 for generalization rules.
+6. **Create meta-skills if discovered** -- if the project revealed new workflow patterns that do not fit existing skill files.
+7. **Update `~/.claude/skills/index.md`** -- add any new skills with descriptions and dependencies.
+8. **Update project MEMORY.md** -- mark status as "Stabilized" (not wrapped). Record completed phases, test counts, final line counts. Satellite files are preserved for reactivation.
+9. **Update home directory memory** -- update the project entry status to "Stabilized". Do NOT move to cold storage -- the project stays in the active section.
+10. **Commit** -- "Stabilize: [project name] -- [milestone summary]"
 
-**Key difference from Project Wrap:** The project stays in the active section of home directory memory. No cold storage move. The project is shelved, not completed -- a future instance can reactivate it by reading the preserved MEMORY.md and satellites.
+> **Note:** Stabilize is not wrap. The project stays in active memory. No cold storage transfer. A future instance can reactivate it by reading the preserved MEMORY.md and satellites.
 
-**When to stabilize vs wrap:**
-- **Stabilize** -- more work is planned (future tiers, features, ports). Knowledge capture now, continue later.
-- **Wrap** -- project is done. No more planned work. Move to cold storage.
+**When to stabilize vs. wrap:**
+- **Stabilize** -- more work is planned (future tiers, features, ports). Capture knowledge now, continue later.
+- **Wrap** -- the project is done. No more planned work. Archive and close.
 
 ---
 
 ## 12. Project Wrap
 
-When the project is truly complete -- no more planned phases. The project wrap ensures patterns are preserved and the project record is closed cleanly. This is the ONE time canonical skills get updated with everything the project learned.
+When the project is truly complete -- no more planned phases, no more features to add. The project wrap ensures that accumulated knowledge is preserved and the record is closed cleanly.
 
 1. **Final `/simplify` pass** -- review the last phase's changes.
-2. **Satellite audit** -- read ALL satellite files (patterns.md, systems.md, etc.) cover to cover. For each entry, ask: "Now that the full project is complete, is this generalizable?" Patterns that looked project-specific early on may be clearly universal in hindsight. Promote generalizable patterns to project skills (`docs/`).
-3. **Components audit** -- check `components-index.md`. Did this project adapt any indexed component? If the adaptation is better (more general, more robust), update the index pointer. Did this project create new reusable components? Add them. Direction is always upward.
-4. **Canonical sync** -- sync project skills (`docs/`) -> canonical skills (`~/.claude/skills/`). This is the ONE time canonical skills get updated. Strip project-specific names, generalize code examples, add `[verified]` tags. See the `knowledge-architecture` skill file Section 3 for generalization rules.
-5. **Create meta-skills if discovered** -- if the project revealed new workflow patterns that don't fit existing skills.
-6. **Update `~/.claude/skills/index.md`** -- add any new skills with descriptions and dependencies.
-7. **Update global `~/.claude/CLAUDE.md`** -- if workflow improvements were discovered.
-8. **Update home directory memory** -- move full project entry from MEMORY.md to `completed-projects.md`, replace with one-line index entry (Cold Storage Pattern).
-9. **Update project MEMORY.md and satellites** -- all phases complete, final line count, feature summary. Satellite files are preserved for reactivation.
+2. **Deferred findings review** -- read `deferred.md`. ALL items must resolve at wrap -- nothing defers past project close. For each DEFER item: implement now or dismiss with final rationale. For each DISMISS item: confirm rationale. Mark the file as resolved.
+3. **Satellite audit** -- read ALL satellite files (patterns.md, systems.md, etc.) cover to cover. For each entry, ask: "Now that the full project is complete, is this generalizable?" Patterns that looked project-specific early on may be clearly universal in hindsight. Promote generalizable patterns to project skills (`docs/`).
+4. **Components audit** -- check `components-index.md`. Did this project adapt any indexed component? If the adaptation is better, update the index pointer. Did this project create new reusable components? Add them.
+5. **Canonical sync** -- sync project skills (`docs/`) to canonical skill files (`~/.claude/skills/`). This is the ONE time canonical skills are updated during the project's life. Strip project-specific names, generalize code examples, add `[verified]` tags.
+6. **Create meta-skills if discovered** -- if the project revealed workflow patterns that do not fit existing skill files.
+7. **Update `~/.claude/skills/index.md`** -- add any new skills with descriptions and dependencies.
+8. **Update global `~/.claude/CLAUDE.md`** -- if the project revealed workflow improvements.
+9. **Update home directory memory** -- move the full project entry from MEMORY.md to `completed-projects.md`. Replace with a one-line index entry (Cold Storage Pattern).
+10. **Update project MEMORY.md and satellites** -- all phases complete, final line count, feature summary. Satellite files are preserved for reactivation if needed.
 
-If a project teaches you something that doesn't fit existing skills, write a new one.
+If a project teaches you something that does not fit existing skill files, write a new one. That is how the skill library grows.
 
 ---
 
 ## 13. Gotchas
 
-These are real problems encountered across completed projects. If you use this workflow, assume they will happen to you too.
+Collected from completed projects. These are not theoretical risks -- they are failures that occurred on real projects. Assume they will recur.
 
 ### Lifecycle Gotchas
 
 | Issue | Symptom | Fix |
 |-------|---------|-----|
 | `/simplify` scope too broad | Auditing files not changed in this phase | Pass `git diff HEAD~1 --name-only` to scope the audit to phase-changed files only |
-| Session handoff loses context | New Claude doesn't know Phase 0 happened | MEMORY.md is the bridge; home memory has bootstrap info |
+| Session handoff loses context | New instance doesn't know Phase 0 happened | MEMORY.md is the bridge; home memory has bootstrap info |
 | Plan file treated as living document | Plan diverges from reality, causes confusion | Plan file is write-once. CLAUDE.md is the living document. |
-| Phase numbering gaps (5.5) | Progress tracking breaks | Use string-based phase IDs; gaps are fine |
+| Phase numbering gaps (5.5) | Progress tracking breaks | Use string-based phase IDs; gaps are acceptable |
 | Phase dropped mid-project | Quality gate has impossible items | Mark with `~~strikethrough~~` and "(Dropped)" |
-| Over-engineered Phase 0 | Weeks on skills before writing any code | Phase 0 is scaffolding. Skills update during implementation. |
+| Over-engineered Phase 0 | Weeks on scaffolding before writing any code | Phase 0 is scaffolding. Skills refine during implementation. |
 | Canonical skills not synced | Pattern from Phase 3 missing from canonical | Canonical sync happens at stabilize (Section 11) or project wrap (Section 12), not per-phase. Per-phase updates go to project copies (`docs/`) only. |
 | TestingGuide format wrong | Copy Report shows IDs, not step names | Use `id="check-N-M"` + `<label for>` (not wrapped) |
-| Memory file too large | MEMORY.md exceeds 200-line context limit | Move completed projects to `completed-projects.md` (Cold Storage Pattern). For project memory, split into satellite files (Section 10, `knowledge-architecture` skill file). |
+| Memory file too large | MEMORY.md exceeds 200-line context limit | Move completed projects to `completed-projects.md` (Cold Storage Pattern). For project memory, split into satellite files (Section 10, `knowledge-architecture.md`). |
 | Project memory deleted on wrap | Completed project reactivated but no memory files exist | Preserve project MEMORY.md and satellites on wrap -- needed for bug fixes. Cold storage is for *home directory* memory, not project memory. |
 | Satellite files created too early | Empty satellite files for a 3-phase project | Let the 200-line pressure drive the split. Phases 0-2 usually fit in MEMORY.md alone. |
-| Field surprises lost | Tool deployed, bugs found in field, no record | After first real-world deployment, add a `## Field Notes` section to project MEMORY.md or a satellite. Record what surprised you -- hardware-specific failures, silent flags that didn't work, environment differences. Lightweight, optional, but invaluable for the next version. |
+| Field surprises lost | Tool deployed, bugs found in field, no record | After first real-world deployment, add a Field Notes section to project MEMORY.md or a satellite. |
 
 ### Testing Gotchas
 
@@ -634,17 +648,21 @@ These are real problems encountered across completed projects. If you use this w
 - [ ] Define project scope (what it does, tech stack, constraints)
 - [ ] Read `~/.claude/skills/index.md` -- cross-reference plan requirements against full index
 - [ ] Check `~/.claude/skills/components-index.md` -- identify reusable implementations
-- [ ] Research and create any missing skills for the project's tech stack
+- [ ] Research and create any missing skill files for the project's tech stack
 - [ ] Add new skills to `index.md` with descriptions and dependencies
+- [ ] Set dependency policy (self-contained vs. framework packages)
 - [ ] **Use plan mode for architectural decisions** -- tech stack, runtime target, module structure, key tradeoffs
-- [ ] Create `[ProjectRoot]/` directory with standard structure
+- [ ] Run pattern fit check before writing the plan
+- [ ] Run plan critique agent against draft plan
+- [ ] Create project directory with standard structure
 - [ ] Create `.gitignore` (exclude `.claude/`, runtime artifacts, credentials)
 - [ ] `git init` and initial commit
-- [ ] Copy relevant skills to `[ProjectRoot]/docs/`
+- [ ] Copy relevant skill files to `[ProjectRoot]/docs/`
 - [ ] Write `[ProjectRoot]/CLAUDE.md` from template
 - [ ] Write `[ProjectRoot]/tests/TestingGuide.html` from template
 - [ ] Add bootstrap entry to home directory memory
 - [ ] Create plan file at `~/.claude/plans/[plan-name].md` (include test deliverables per phase)
+- [ ] Create project memory folder + architecture satellite (`phase0-architecture.md`)
 - [ ] **Commit Phase 0** -- `git add` all project scaffolding, commit "Phase 0: Project infrastructure"
 
 ### Session Handoff Checklist
@@ -657,16 +675,17 @@ These are real problems encountered across completed projects. If you use this w
 
 | # | Action | Output |
 |---|--------|--------|
-| 1 | Phase kickoff | Plan critique (subagent) + gameplan (incl. test plan) + numbered questions/suggestions tagged [Design] [Clarification] [Suggestion] [Risk] [Critic]. Pseudocode gate for complex algorithms. |
-| 2 | Write code + automated tests | Feature implemented, automated tests pass. Code NOT presented for review until tests pass. |
+| 1 | Phase kickoff (`/kickoff`) | Phase 0 assumption check + gameplan (incl. test plan) + numbered questions/suggestions tagged [Design] [Clarification] [Suggestion] [Risk] [Critic]. Pseudocode gate for complex algorithms. Creates phase satellite. |
+| 2 | Write code + automated tests | Feature implemented, automated tests pass. Code NOT presented for review until tests pass. Mid-phase decisions recorded in phase satellite. |
 | 3 | Update TestingGuide | Manual test steps for user-facing behavior (separate from automated tests) |
 | 4 | User tests | Checkboxes filled |
 | 5 | User reports | Copy Report pasted to conversation |
 | 6 | Fix failures | All TODOs resolved |
-| 7 | `/simplify` | 3-agent audit complete |
-| 8 | Fix findings | Real issues fixed, false positives noted |
+| 7 | `/simplify` | 3-agent audit + FIX/DEFER/DISMISS categorization. Deferred items to `deferred.md`. |
+| 8 | Fix findings | FIX-category issues resolved |
 | 8a | Testing audit (`/test-audit`, conditional) | If non-trivial failures: classify root causes, extract patterns to testing satellite |
-| 9 | Update CLAUDE.md | Phase marked complete |
+| 8b | Scope reduction check | Plan requirements vs. actual deliverables verified; stubs/placeholders flagged |
+| 9 | Update CLAUDE.md (`/phase-wrap`) | Phase marked complete. Reads phase satellite, checks deferred.md. Steps 8a-11 + commit. |
 | 10 | Update project skills | `[verified in Phase N]` on project copies (`docs/`) only; extract patterns to project skills + satellites |
 | 11 | Update MEMORY.md + satellites | Status, decisions, gotchas; migrate detail to satellites when MEMORY.md grows |
 | 12 | Commit phase | Clean working tree before next phase |
